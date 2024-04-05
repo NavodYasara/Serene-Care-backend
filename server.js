@@ -1,28 +1,25 @@
-import express from 'express';
-import mysql from 'mysql'
-import cors from 'cors'
-import jwt from 'jsonwebtoken'
-import bcrypt from 'bcrypt'
-import cookieparser from 'cookie-parser'
+const express = require('express');
+const mysql = require('mysql');
+const cors = require('cors');
+const path = require('path');
 
+const app = express()
 
-const app = express() // create express app
-app.use(express.json()) // for parsing application/json
-app.use(cors()) // for enabling cors
-app.use(cookieparser()) // for parsing cookies
+app.use(express.static(path.join(__dirname, 'build'))); //middleware to serving static files
+app.use(cors())  //managing web security
+app.use(express.json())  //parse json data from http requests
 
-// create mysql connection
+const port = 5000
+
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "",
-    database: "login"
-})
+    database: "serene_care_solution"
+}) 
 
-// start express server on port 3001
-app.listen(8081, () => {
-    console.log('Server is running on port 8081');
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`)
 })
-
 
 
