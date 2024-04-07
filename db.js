@@ -5,7 +5,7 @@ const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'testdb'
+    database: 'serene_care_solution'
 });
 
 // Connect to MySQL
