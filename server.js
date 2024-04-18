@@ -1,13 +1,15 @@
 import express from 'express'
 import mysql from 'mysql2'
 import cors from 'cors'
+import loginRoutes from './routes/Login.js'
 
 
-const app = express();
-app.use(cors());
+const app = express(); // Create an Express application
+app.use(cors()); // Enable CORS for all requests
 
-app.use(express.json());
+app.use(express.json()); // Enable parsing JSON request bodies
 
+// Create a MySQL connection
 export const db =  mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -15,12 +17,14 @@ export const db =  mysql.createConnection({
   database: 'serene_care_solution'
 });
 
-// app.use('server/login', loginRoutes);
+app.use('/server/login', loginRoutes);
 
+// Start the Express server
 app.listen(3001, () => {
     console.log('server working');
 })
 
+// Connect to MySQL
 db.connect((err) => {
     if (err) {
         console.error('Error connecting to MySQL:', err);
@@ -29,7 +33,7 @@ db.connect((err) => {
     console.log('Connected to MySQL database');
 });
 
-
+// Define a route to retrieve all users
 app.get('/users', (req, res) => {
     // Define the SQL query to retrieve data from the user table
     const sql = 'SELECT * FROM user';
@@ -38,8 +42,8 @@ app.get('/users', (req, res) => {
     db.query(sql, (err, results) => {
         if (err) {
             // If there's an error, send a 500 Internal Server Error response
-            console.error('Error retrieving user data:', err);
-            res.status(500).json({ error: 'Internal Server Error' });
+            console.error(err.message);
+            res.status(500).json(err.message);
         } else {
             // If the query is successful, send the results as a JSON response
             res.json(results);
