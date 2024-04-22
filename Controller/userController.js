@@ -26,8 +26,8 @@ export const login = (req, res) => {
 };
 
 export const register = (req, res) => {
-    const { username, password, user_type } = req.body;
-    if (!username || !password || !user_type) {
+    const { username, password } = req.body;
+    if (!username || !password ) {
         return res.status(400).json({ error: 'Username, usertype and password are required' });
     }
 
@@ -43,7 +43,7 @@ export const register = (req, res) => {
         }
 
         // Insert the new user into the database
-        db.query('INSERT INTO user SET ?', { username, password, user_type }, (err, results) => {
+        db.query('INSERT INTO user SET ?', { username, password }, (err, results) => {
             if (err) {
                 console.error('Error during registration:', err);
                 return res.status(500).json({ error: 'Internal Server Error', details: err.message });
