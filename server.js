@@ -8,8 +8,7 @@ app.use(cors()); // Enable CORS for all requests
 app.use(express.json()); // Enable parsing JSON request bodies using the middleware
 
 // Create a MySQL connection
-
-export const db =  mysql.createConnection({
+export const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: 'admin',
@@ -24,7 +23,6 @@ app.listen(5000, () => {
 })
 
 // Connect to MySQL
-
 db.connect((err) => {
     if (err) {
         console.error('Error connecting to MySQL:', err);
@@ -35,7 +33,7 @@ db.connect((err) => {
 
 // Define a route to retrieve all users
 app.get('/user', (req, res) => {
-    
+
     // Define the SQL query to retrieve data from the user table
     const sql = 'SELECT * FROM user';
 
@@ -52,6 +50,3 @@ app.get('/user', (req, res) => {
     });
 
 });
-
-
-
