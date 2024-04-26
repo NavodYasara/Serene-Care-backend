@@ -35,6 +35,7 @@ db.connect((err) => {
 
 // Define a route to retrieve all users
 app.get('/user', (req, res) => {
+    
     // Define the SQL query to retrieve data from the user table
     const sql = 'SELECT * FROM user';
 

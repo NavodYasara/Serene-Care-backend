@@ -2,7 +2,6 @@ import { db } from '../server.js';
 
 export const login = (req, res) => {
     const { username, password, usertype } = req.body;
-    
     if (!username || !password || !usertype) {
         return res.status(400).json({ error: 'Username, password, and usertype are required' });
     }
