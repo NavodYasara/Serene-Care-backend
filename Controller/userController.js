@@ -26,12 +26,12 @@ export const login = (req, res) => {
     });
 };
 
-export const register = (req, res) => {
+export const registerCaretaker = (req, res) => {
     const { username, password } = req.body;
     const usertype = 'caretaker';
 
     if (!username || !password) {
-        return res.status(400).json({ error: 'Username, and password are required' });
+        return res.status(400).json({ error: 'Username and password are required' });
     }
 
     // Check if user exists in the database
@@ -46,7 +46,7 @@ export const register = (req, res) => {
         }
 
         // Insert the new user into the database
-        db.query('INSERT INTO user SET ?', { username, password,usertype }, (err, results) => {
+        db.query('INSERT INTO user SET ?', { username, password, usertype }, (err, results) => {
             if (err) {
                 console.error('Error during registration:', err);
                 return res.status(500).json({ error: 'Internal Server Error', details: err.message });
