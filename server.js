@@ -1,7 +1,7 @@
 import express from 'express'
 import mysql from 'mysql2'
 import cors from 'cors'
-import loginRoutes from './routes/Login.js'
+import loginRoutes from './routes/userRoutes.js'
 
 const app = express(); // Create an Express application as middleware
 app.use(cors()); // Enable CORS for all requests

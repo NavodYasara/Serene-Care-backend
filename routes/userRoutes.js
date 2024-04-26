@@ -3,7 +3,7 @@ import {login, registerCaretaker} from '../Controller/usercontroller.js';
 
 const router = express.Router();
 
-router.get('/login', login); // Define the route for the login controller
+router.get('/userRoutes', login); // Define the route for the login controller
 router.post('/registerCaretaker',registerCaretaker); // Define the route for the register controller
 
 
