@@ -2,6 +2,7 @@ import { db } from '../server.js';
 
 export const login = (req, res) => {
     const { username, password, usertype } = req.body;
+    
     if (!username || !password || !usertype) {
         return res.status(400).json({ error: 'Username, password, and usertype are required' });
     }
@@ -26,13 +27,15 @@ export const login = (req, res) => {
 };
 
 export const register = (req, res) => {
-    const { username, password, usertype } = req.body;
-    if (!username || !password || !usertype) {
-        return res.status(400).json({ error: 'Username, password, and usertype are required' });
+    const { username, password } = req.body;
+    const usertype = 'caretaker';
+
+    if (!username || !password) {
+        return res.status(400).json({ error: 'Username, and password are required' });
     }
 
     // Check if user exists in the database
-    db.query('SELECT * FROM user WHERE username = ?', [username], (err, results) => {
+    db.query('SELECT * FROM user WHERE username = ? AND usertype = ?', [username, usertype], (err, results) => {
         if (err) {
             console.error('Error during registration:', err);
             return res.status(500).json({ error: 'Internal Server Error', details: err.message });
@@ -43,7 +46,7 @@ export const register = (req, res) => {
         }
 
         // Insert the new user into the database
-        db.query('INSERT INTO user SET ?', { username, password, usertype }, (err, results) => {
+        db.query('INSERT INTO user SET ?', { username, password,usertype }, (err, results) => {
             if (err) {
                 console.error('Error during registration:', err);
                 return res.status(500).json({ error: 'Internal Server Error', details: err.message });

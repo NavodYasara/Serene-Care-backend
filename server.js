@@ -3,13 +3,12 @@ import mysql from 'mysql2'
 import cors from 'cors'
 import loginRoutes from './routes/Login.js'
 
-
-const app = express(); // Create an Express application
+const app = express(); // Create an Express application as middleware
 app.use(cors()); // Enable CORS for all requests
-
-app.use(express.json()); // Enable parsing JSON request bodies
+app.use(express.json()); // Enable parsing JSON request bodies using the middleware
 
 // Create a MySQL connection
+
 export const db =  mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -18,14 +17,14 @@ export const db =  mysql.createConnection({
 });
 
 app.use('/server', loginRoutes);
-app.use('/server', loginRoutes);
 
 // Start the Express server
-app.listen(3001, () => {
+app.listen(5000, () => {
     console.log('server working');
 })
 
 // Connect to MySQL
+
 db.connect((err) => {
     if (err) {
         console.error('Error connecting to MySQL:', err);
@@ -35,7 +34,7 @@ db.connect((err) => {
 });
 
 // Define a route to retrieve all users
-app.get('/users', (req, res) => {
+app.get('/user', (req, res) => {
     // Define the SQL query to retrieve data from the user table
     const sql = 'SELECT * FROM user';
 
@@ -50,6 +49,7 @@ app.get('/users', (req, res) => {
             res.json(results);
         }
     });
+
 });
 
 
