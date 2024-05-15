@@ -31,14 +31,11 @@ db.connect((err) => {
     console.log('Connected to MySQL database');
 });
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 // Define a route to retrieve all users
-app.get('/user', (req, res) => {
+app.get('/server/usernew', (req, res) => {
 
     // Define the SQL query to retrieve data from the user table
-    const sql = 'SELECT * FROM user';
+    const sql = 'SELECT * FROM usernew';
 
     // Execute the query
     db.query(sql, (err, results) => {
@@ -54,9 +51,8 @@ app.get('/user', (req, res) => {
 
 });
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-app.get('/caretakerDetails', (req, res) => {
+// Define a route to retrieve all caretaker details
+app.get('/server/caretakerDetails', (req, res) => {
     const sql = 'SELECT * FROM caretaker';
     db.query(sql, (err, results) => {
         if (err) {
