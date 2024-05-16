@@ -149,39 +149,6 @@ export const login = (req, res) => {
   });
 };
 
-
-// export const login = (req, res) => {
-//   const { username, password } = req.body;
-
-//   if (!username || !password) {
-//     return res
-//       .status(400)
-//       .json({ error: "Username and password are required" });
-//   }
-
-//   db.query(
-//     "SELECT * FROM usernew WHERE username = ? AND password = ?",
-//     [username, password],
-//     (err, results) => {
-//       if (err) {
-//         console.error("Error during login:", err);
-//         return res
-//           .status(500)
-//           .json({ error: "Internal Server Error", details: err.message });
-//       }
-
-//       if (results.length === 0 || password !== results[0].password) {
-//         return res.status(401).json({ error: "Invalid username or password" });
-//       }
-
-//       // Login successful, include user type in the response
-//       const userType = results[0].userType;
-//       res.status(200).json({ message: "Login successful", userType });
-//     }
-//   );
-// };
-
-
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export const userDetails = (req, res) => {
