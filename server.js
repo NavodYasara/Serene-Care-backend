@@ -1,26 +1,24 @@
 import express from 'express'
 import mysql from 'mysql2'
 import cors from 'cors'
-import loginRoutes from './routes/Login.js'
+import loginRoutes from './routes/userRoutes.js'
 
-
-const app = express(); // Create an Express application
+const app = express(); // Create an Express application as middleware
 app.use(cors()); // Enable CORS for all requests
-
-app.use(express.json()); // Enable parsing JSON request bodies
+app.use(express.json()); // Enable parsing JSON request bodies using the middleware
 
 // Create a MySQL connection
-export const db =  mysql.createConnection({
+export const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: 'admin',
   database: 'serene_care_solution'
 });
 
-app.use('/server/login', loginRoutes);
+app.use('/server', loginRoutes);
 
 // Start the Express server
-app.listen(3001, () => {
+app.listen(5000, () => {
     console.log('server working');
 })
 
@@ -34,9 +32,10 @@ db.connect((err) => {
 });
 
 // Define a route to retrieve all users
-app.get('/users', (req, res) => {
+app.get('/server/usernew', (req, res) => {
+
     // Define the SQL query to retrieve data from the user table
-    const sql = 'SELECT * FROM user';
+    const sql = 'SELECT * FROM usernew';
 
     // Execute the query
     db.query(sql, (err, results) => {
@@ -49,7 +48,18 @@ app.get('/users', (req, res) => {
             res.json(results);
         }
     });
+
 });
 
-
-
+// Define a route to retrieve all caretaker details
+app.get('/server/caretakerDetails', (req, res) => {
+    const sql = 'SELECT * FROM caretaker';
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error(err.message);
+            res.status(500).json(err.message);
+        } else {
+            res.json(results);
+        }
+    });
+})
