@@ -7,7 +7,9 @@ const app = express(); // Create an Express application as middleware
 app.use(cors()); // Enable CORS for all requests
 app.use(express.json()); // Enable parsing JSON request bodies using the middleware
 
-// Create a MySQL connection
+
+//////////// Create a MySQL connection //////////////////////////////////////////////////////////////////////////////
+
 export const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -17,12 +19,14 @@ export const db = mysql.createConnection({
 
 app.use('/server', loginRoutes);
 
-// Start the Express server
+/////////////////  Start the Express server  /////////////////////////////
+
 app.listen(5000, () => {
     console.log('server working');
 })
 
-// Connect to MySQL
+///////// Connect to MySQL ////////////////////////////////////////////////////////////////////////////////////////
+
 db.connect((err) => {
     if (err) {
         console.error('Error connecting to MySQL:', err);
@@ -31,7 +35,9 @@ db.connect((err) => {
     console.log('Connected to MySQL database');
 });
 
-// Define a route to retrieve all users
+///////////////  Define a route to retrieve all users  //////////////////////////////////////////////////////////////
+
+
 app.get('/server/usernew', (req, res) => {
 
     // Define the SQL query to retrieve data from the user table
@@ -51,7 +57,10 @@ app.get('/server/usernew', (req, res) => {
 
 });
 
-// Define a route to retrieve all caretaker details
+
+//////////// Define a route to retrieve all caretaker details /////////////////////////////////////////////////////
+
+
 app.get('/server/caretakerDetails', (req, res) => {
     const sql = 'SELECT * FROM caretaker';
     db.query(sql, (err, results) => {
@@ -63,3 +72,7 @@ app.get('/server/caretakerDetails', (req, res) => {
         }
     });
 })
+
+
+///////////////  Define a route to   //////////////////////////////////////////////////////////////
+
