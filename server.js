@@ -4,6 +4,7 @@ import cors from 'cors';
 
 import loginRoutes from './routes/userRoutes.js';
 import requirementRoutes from './routes/requirementRoutes.js';
+import managerRoutes from './routes/managerRoutes.js';
 // import careplanRoutes from './routes/careplanRoutes.js';
 // import reportRoutes from './routes/reportRoutes.js';
 // import paymentRoutes from './routes/paymentRoutes.js';
@@ -34,21 +35,19 @@ db.connect((err) => {
 });
 
 //################### Define Routes ####################################################################
-app.use('/api', loginRoutes);
-app.use('/api', requirementRoutes);
-// app.use('/api', careplanRoutes);
-// app.use('/api', reportRoutes);
-// app.use('/api', paymentRoutes);
-
-//#####################################################################################################
+app.use('/api/user', loginRoutes);
+app.use('/api/requirement', requirementRoutes);
+app.use('/api/manager', managerRoutes);
+// app.use('/api/report', reportRoutes);
+// app.use('/api/payment', paymentRoutes);
 
 // Define a route to retrieve all users
 app.get('/server/usernew', (req, res) => {
   const sql = 'SELECT * FROM usernew';
   db.query(sql, (err, results) => {
     if (err) {
-      console.error(err.message);
-      res.status(500).json(err.message);
+      console.error('Error retrieving users:', err.message);
+      res.status(500).json({ error: 'Failed to retrieve users' });
     } else {
       res.json(results);
     }
@@ -60,8 +59,8 @@ app.get('/server/caretakerDetails', (req, res) => {
   const sql = 'SELECT * FROM caretakernew';
   db.query(sql, (err, results) => {
     if (err) {
-      console.error(err.message);
-      res.status(500).json(err.message);
+      console.error('Error retrieving caretaker details:', err.message);
+      res.status(500).json({ error: 'Failed to retrieve caretaker details' });
     } else {
       res.json(results);
     }
@@ -74,8 +73,9 @@ app.use((req, res) => {
 });
 
 ///////////////  Start the Express server  /////////////////////////////
-app.listen(5000, () => {
-  console.log('Server is running on port 5000');
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 
 
