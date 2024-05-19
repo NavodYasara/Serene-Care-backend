@@ -32,8 +32,8 @@ db.connect((err) => {
         console.error('Error connecting to MySQL:', err);
         return;
     }
-    console.log('Connected to MySQL database');
-});
+    console.log('Connected to seren_cere_solution database!');
+}); 
 
 ///////////////  Define a route to retrieve all users  //////////////////////////////////////////////////////////////
 
@@ -57,7 +57,6 @@ app.get('/server/usernew', (req, res) => {
 
 });
 
-
 //////////// Define a route to retrieve all caretaker details /////////////////////////////////////////////////////
 
 
@@ -75,4 +74,15 @@ app.get('/server/caretakerDetails', (req, res) => {
 
 
 ///////////////  Define a route to   //////////////////////////////////////////////////////////////
+
+app.post('/server/usernew', (req, res) => {
+
+    const username = req.body.username; 
+
+});
+
+/////////////  Experiments  ////////////////////////////////////////////////////////////////////
+
+
+
 
