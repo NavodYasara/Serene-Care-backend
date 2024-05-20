@@ -17,7 +17,7 @@ export const db = mysql.createConnection({
   database: 'serene_care_solution'
 });
 
-app.use('/server', loginRoutes);
+app.use('/api', loginRoutes);
 
 /////////////////  Start the Express server  /////////////////////////////
 
