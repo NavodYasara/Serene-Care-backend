@@ -86,6 +86,7 @@ export const registerCaretaker = (req, res) => {
 
 
 //########################################################################################
+// Controller function to Login user
 
 export const login = (req, res) => {
   const { username, password } = req.body;
@@ -149,8 +150,8 @@ export const userDetails = (req, res) => {
 };
 
 //#############################################################################################
-
 // Controller function to retrieve all caretaker details from the database
+
 export const getCaretakerDetails = (req, res) => {
   const query = "SELECT * FROM caretaker";
 
