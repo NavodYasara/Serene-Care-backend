@@ -1,4 +1,5 @@
-const mysql = require('mysql');
+import mysql from 'mysql2'
+// const mysql = require('mysq2');
 
 // Database connection configuration
 const db = mysql.createConnection({

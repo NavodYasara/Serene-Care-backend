@@ -1,5 +1,10 @@
 import express from 'express';
-import {login, registerCaretaker, userDetails,getCaretakerDetails} from '../Controller/usercontroller.js';
+import {
+    login,
+    registerCaretaker,
+    userDetails,
+    getCaretakerDetails,
+    } from '../Controller/usercontroller.js';
 
 const router = express.Router();
 
