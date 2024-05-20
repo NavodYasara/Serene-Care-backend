@@ -1,6 +1,7 @@
 import { db } from "../server.js";
 
-// Controller function to insert details into the requirement table of the database
+//##############  Controller function to insert details into the requirement table of the database ###############################
+
 export const insertRequirement = (req, res) => {
   const { requirement, startDate, endDate, mediCondition, prefGender, caretakerId } = req.body;
 
@@ -20,8 +21,8 @@ export const insertRequirement = (req, res) => {
   );
 };
 
+//##############  Controller function to fetch all requirements from the database ###############################
 
-// Controller function to fetch all requirements from the database
 export const getAllRequirements = (req, res) => {
   db.query("SELECT * FROM requirement", (err, results) => {
     if (err) {
