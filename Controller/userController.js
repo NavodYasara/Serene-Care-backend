@@ -94,7 +94,7 @@ export const login = (req, res) => {
   }
 
   db.query(
-    "SELECT * FROM usernew WHERE username = ?",
+    "SELECT * FROM usernew WHERE username = ? ",
     [username],
     (err, results) => {
       if (err) {
@@ -105,7 +105,7 @@ export const login = (req, res) => {
       }
 
       if (results.length === 0) {
-        return res.status(401).json({ error: "Invalid username or password" });
+        return res.status(401).json({ error: "You're not registered!" });
       }
 
       bcrypt.compare(password, results[0].password, (err, isMatch) => {
@@ -122,16 +122,22 @@ export const login = (req, res) => {
             .json({ error: "Invalid username or password" });
         }
 
-        if (isMatch) {
-          const token = generateToken(results[0].id, results[0].userType);
-          res
-            .status(200)
-            .json({ message: "Login successful", token, userType });
-        }
+        // Login successful, include user type in the response
+        const userType = results[0].userType;
+        res.status(200).json({ message: "Login successful", userType });
 
-        // // Login successful, include user type in the response
-        // const userType = results[0].userType;
-        // res.status(200).json({ message: "Login successful", userType });
+        const username = req.body.userName;
+        const user = { name: username };
+
+        const token = JsonWebTokenError.sign(user, "this is token");
+        res.json({ token: token });
+
+        // if (isMatch) {
+        //   const token = generateToken(results[0].id, results[0].userType);
+        //   res
+        //     .status(200)
+        //     .json({ message: "Login successful", token, userType });
+        // }
       });
     }
   );
