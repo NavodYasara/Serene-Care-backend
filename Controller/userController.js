@@ -84,7 +84,6 @@ export const registerCaretaker = (req, res) => {
   });
 };
 
-
 //########################## Controller function to Login user ###########################################################################
 
 

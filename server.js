@@ -4,6 +4,9 @@ import cors from 'cors';
 
 import loginRoutes from './routes/userRoutes.js';
 import requirementRoutes from './routes/requirementRoutes.js';
+// import careplanRoutes from './routes/careplanRoutes.js';
+// import reportRoutes from './routes/reportRoutes.js';
+// import paymentRoutes from './routes/paymentRoutes.js';
 
 // Create an Express application as middleware
 const app = express();
