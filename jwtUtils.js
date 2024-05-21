@@ -32,7 +32,6 @@ export const verifyTokenAndCheckRole = (roles) => {
       return res.status(401).json({ error: "No token provided" });
     }
 
-
     if (!decoded) {
       return res.status(401).json({ error: "Invalid token" });
     }

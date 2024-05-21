@@ -6,7 +6,7 @@ import {
     getCaretakerDetails,
     registerPatient,
 } from '../Controller/userController.js';
-import { verifyToken } from '../jwtUtils.js';   
+import { verifyTokenAndCheckRole } from '../jwtUtils.js';   
 
 const router = express.Router();
 
