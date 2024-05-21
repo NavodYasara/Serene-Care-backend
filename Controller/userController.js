@@ -149,8 +149,8 @@ export const userDetails = (req, res) => {
   });
 };
 
-//#############################################################################################
-// Controller function to retrieve all caretaker details from the database
+//#####################  Controller function to retrieve all caretaker details from the database  ########################################################################
+
 
 export const getCaretakerDetails = (req, res) => {
   const query = "SELECT * FROM caretaker";
@@ -167,8 +167,8 @@ export const getCaretakerDetails = (req, res) => {
   });
 };
 
-//########################################################################################
-// Controller function to retrieve relevent patient by their caretakerID
+//########  Controller function to retrieve relevent patient by their caretakerID  ################################################################################
+
 
 export const getCareTakerById = (req, res) => {
   const userId = req.params.id;
@@ -186,8 +186,7 @@ export const getCareTakerById = (req, res) => {
   });
 };
 
-//########################################################################################
-// controller function to register a new patient
+//#########  controller function to register a new patient  #####################################
 
 export const registerPatient = (req, res) => {
   const {
