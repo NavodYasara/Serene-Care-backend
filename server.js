@@ -33,9 +33,14 @@ db.connect((err) => {
   console.log('Connected to MySQL database');
 });
 
-//////////// Define Routes //////////////////////////////////////////////////////////////////////////////
+//################### Define Routes ####################################################################
 app.use('/api', loginRoutes);
 app.use('/api', requirementRoutes);
+// app.use('/api', careplanRoutes);
+// app.use('/api', reportRoutes);
+// app.use('/api', paymentRoutes);
+
+//#####################################################################################################
 
 // Define a route to retrieve all users
 app.get('/server/usernew', (req, res) => {

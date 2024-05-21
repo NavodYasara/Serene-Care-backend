@@ -4,10 +4,7 @@ import { insertRequirement, getAllRequirements } from '../Controller/requirement
 
 const router = express.Router();
 
-// Route to insert a new requirement
-router.post('/requirement', insertRequirement);
-
-// Route to get all requirements
-router.get('/requirements', getAllRequirements);
+router.post('/requirement', insertRequirement); // Route to insert a new requirement
+router.get('/requirements', getAllRequirements); // Route to get all requirements
 
 export default router;
