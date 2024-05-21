@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import { db } from "../server.js";
+import { generateToken } from "../jwtUtils.js";
 
 export const registerCaretaker = (req, res) => {
   const { firstName, lastName, userName, password, mobileNo, dob, address } =
@@ -62,19 +63,15 @@ export const registerCaretaker = (req, res) => {
               (err, results) => {
                 if (err) {
                   console.error("Error during address data insertion:", err);
-                  return res
-                    .status(500)
-                    .json({
-                      error: "Internal Server Error",
-                      details: err.message,
-                    });
+                  return res.status(500).json({
+                    error: "Internal Server Error",
+                    details: err.message,
+                  });
                 }
 
-                res
-                  .status(201)
-                  .json({
-                    message: "User and caretaker data registered successfully",
-                  });
+                res.status(201).json({
+                  message: "User and caretaker data registered successfully",
+                });
               }
             );
           }
@@ -83,7 +80,6 @@ export const registerCaretaker = (req, res) => {
     );
   });
 };
-
 
 //########################################################################################
 // Controller function to Login user
@@ -126,9 +122,16 @@ export const login = (req, res) => {
             .json({ error: "Invalid username or password" });
         }
 
-        // Login successful, include user type in the response
-        const userType = results[0].userType;
-        res.status(200).json({ message: "Login successful", userType });
+        if (isMatch) {
+          const token = generateToken(results[0].id, results[0].userType);
+          res
+            .status(200)
+            .json({ message: "Login successful", token, userType });
+        }
+
+        // // Login successful, include user type in the response
+        // const userType = results[0].userType;
+        // res.status(200).json({ message: "Login successful", userType });
       });
     }
   );
@@ -244,12 +247,10 @@ export const registerPatient = (req, res) => {
             (err, results) => {
               if (err) {
                 console.error("Error during address data insertion:", err);
-                return res
-                  .status(500)
-                  .json({
-                    error: "Internal Server Error",
-                    details: err.message,
-                  });
+                return res.status(500).json({
+                  error: "Internal Server Error",
+                  details: err.message,
+                });
               }
 
               res.status(201).json({
@@ -267,12 +268,10 @@ export const registerPatient = (req, res) => {
                   "Error during mediCondition data insertion:",
                   err
                 );
-                return res
-                  .status(500)
-                  .json({
-                    error: "Internal Server Error",
-                    details: err.message,
-                  });
+                return res.status(500).json({
+                  error: "Internal Server Error",
+                  details: err.message,
+                });
               }
 
               res.status(201).json({
