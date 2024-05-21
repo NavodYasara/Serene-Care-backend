@@ -29,12 +29,7 @@ db.connect((err) => {
     }
     console.log('Connected to seren_cere_solution database!');
 }); 
-  if (err) {
-    console.error('Error connecting to MySQL:', err);
-    return;
-  }
-  console.log('Connected to MySQL database');
-});
+  
 
 //////////// Define Routes //////////////////////////////////////////////////////////////////////////////
 app.use('/api', loginRoutes);
