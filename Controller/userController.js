@@ -2,6 +2,11 @@ import bcrypt from "bcrypt";
 import { db } from "../server.js";
 import { generateToken } from "../jwtUtils.js";
 
+import jwt from "jsonwebtoken";
+import express from "express";
+
+const app = express();
+
 export const registerCaretaker = (req, res) => {
   const { firstName, lastName, userName, password, mobileNo, dob, address } =
     req.body;
@@ -85,17 +90,17 @@ export const registerCaretaker = (req, res) => {
 // Controller function to Login user
 
 export const login = (req, res) => {
-  const { username, password } = req.body;
+  const { userName, password } = req.body;
 
-  if (!username || !password) {
+  if (!userName || !password) {
     return res
       .status(400)
       .json({ error: "Username and password are required" });
   }
 
   db.query(
-    "SELECT * FROM usernew WHERE username = ? ",
-    [username],
+    "SELECT * FROM usernew WHERE userName = ?",
+    [userName],
     (err, results) => {
       if (err) {
         console.error("Error during login:", err);
@@ -105,7 +110,7 @@ export const login = (req, res) => {
       }
 
       if (results.length === 0) {
-        return res.status(401).json({ error: "You're not registered!" });
+        return res.status(401).json({ error: "Invalid username or password" });
       }
 
       bcrypt.compare(password, results[0].password, (err, isMatch) => {
@@ -122,22 +127,16 @@ export const login = (req, res) => {
             .json({ error: "Invalid username or password" });
         }
 
-        // Login successful, include user type in the response
+        const user = { userName: results[0].userName };
+        const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+          expiresIn: "4h",
+        });
+
+        // Login successful, include user type and token in the response
         const userType = results[0].userType;
-        res.status(200).json({ message: "Login successful", userType });
-
-        const username = req.body.userName;
-        const user = { name: username };
-
-        const token = JsonWebTokenError.sign(user, "this is token");
-        res.json({ token: token });
-
-        // if (isMatch) {
-        //   const token = generateToken(results[0].id, results[0].userType);
-        //   res
-        //     .status(200)
-        //     .json({ message: "Login successful", token, userType });
-        // }
+        res
+          .status(200)
+          .json({ message: "Login successful", userType, accessToken });
       });
     }
   );
