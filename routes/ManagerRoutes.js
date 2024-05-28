@@ -4,7 +4,7 @@ import { getCaretakers, getCaretakerInformation, getCaregivers } from '../Contro
 const router = express.Router();
 
 router.get('/getCaretakers', getCaretakers);
-router.get('/caretakerInformation', getCaretakerInformation);
+router.get('/getCaretakerInformation', getCaretakerInformation);
 // router.get('/caretakerInformation/:id', getCaretakerInformation);
 router.get('/caregivers', getCaregivers);
 

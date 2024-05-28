@@ -22,9 +22,9 @@ import { db } from "../server.js";
 // };
 
 
-export const insertRequirement = (req, res) => {
+export const insertRequest = (req, res) => {
   console.log(req.body);
-  const { requirements, userId } = req.body;
+  const { startDate, endDate, requirement, userId } = req.body;
 
   if (!userId) {
     return res.status(400).json({ error: "User ID is required" });
@@ -50,8 +50,8 @@ export const insertRequirement = (req, res) => {
 
       // Now, insert the requirements into the caretakerrequirement table with the obtained caretakerId
       db.query(
-        "INSERT INTO requirement (requirement, caretakerId) VALUES (?, ?)",
-        [requirements, caretakerId],
+        "INSERT INTO requirement (startDate, endDate, requirement, caretakerId) VALUES (?,?,?, ?)",
+        [startDate, endDate, requirement, caretakerId],
         (err, results) => {
           if (err) {
             console.error("Error during requirement insertion:", err);
@@ -73,43 +73,64 @@ export const insertRequirement = (req, res) => {
 //##############  Controller function to insert require data to the database  ###############################
 
 
-export const insertRequest = async (req, res) => {
-  const { startDate, endDate, preferredGender, userId } = req.body;
+// export const insertRequest = async (req, res) => {
+//   const { startDate, endDate, preferredGender, userId , requirement} = req.body;
 
-  try {
-    // Start a transaction
-    await db.beginTransaction();
+//   try {
+//     // Start a transaction
+//     await db.beginTransaction();
 
-    // Insert startDate and endDate into the requirement table
-    const insertRequirementQuery = `
-      INSERT INTO requirement (caretakerId, startDate, endDate)
-      VALUES (?, ?, ?)
-    `;
-    const requirementResult = await db.query(insertRequirementQuery, [userId, startDate, endDate]);
+//     // Insert startDate and endDate into the requirement table
+//     const insertRequirementQuery = `
+//       INSERT INTO requirement (caretakerId, startDate, endDate, requirement)
+//       VALUES (?, ?, ?, ?)
+//     `;
+//     const requirementResult = await db.query(insertRequirementQuery, [userId, startDate, endDate, requirement]);
 
-    // Get the inserted requirement's ID
-    const requirementId = requirementResult.insertId;
+//     // Get the inserted requirement's ID
+//     const requirementId = requirementResult.insertId;
 
-    // Update preferredGender in the caretakernew table
-    const updateCaretakerQuery = `
-      UPDATE caretakernew
-      SET prefGender = ?
-      WHERE caretakerId = ?
-    `;
-    await db.query(updateCaretakerQuery, [preferredGender, userId]);
+//     // Update preferredGender in the caretakernew table
+//     // const updateCaretakerQuery = `
+//     //   UPDATE caretakernew
+//     //   SET prefGender = ?
+//     //   WHERE caretakerId = ?
+//     // `;
+//     // await db.query(updateCaretakerQuery, [preferredGender, userId]);
 
-    // Commit the transaction
-    await db.commit();
+//     // Commit the transaction
+//     await db.commit();
 
-    res.json({ success: true, message: 'Request has been successfully inserted' });
-  } catch (err) {
-    // Rollback the transaction in case of error
-    await db.rollback();
+//     res.json({ success: true, message: 'Request has been successfully inserted' });
+//   } catch (err) {
+//     // Rollback the transaction in case of error
+//     await db.rollback();
 
-    console.error("Error inserting request:", err.message);
-    res.status(500).json({ error: "Internal Server Error", details: err.message });
-  }
-};
+//     console.error("Error inserting request:", err.message);
+//     res.status(500).json({ error: "Internal Server Error", details: err.message });
+//   }
+// // };
+// export const insertRequest =  (req, res) => {
+//   const { startDate, endDate, requirement, userId } = req.body;
+
+//   const query = 'INSERT INTO requirement ( startDate, endDate, requirement) VALUES ( ?, ?, ?)';
+
+//   db.query(
+//     query,
+//     [ startDate, endDate, requirement],
+//     (err, results) => {
+//       if (err) {
+//         console.error("Error during request insertion:", err);
+//         return res
+//           .status(500)
+//           .json({ error: "Internal Server Error", details: err.message });
+//       }
+
+//       res.status(201).json({ message: "Request inserted successfully" });
+//     }
+//   );
+// };
+
 
 //##############  Controller function to fetch all requirements from the database ###############################
 export const getAllRequirements = (req, res) => {

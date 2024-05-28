@@ -9,9 +9,7 @@ export const getCaretakers = async (req, res) => {
   WHERE caretakerId = ${caretaker.caretakerId}
 `;
 
-    
     db.query(query, (err, results) => {
-
       console.log(results);
 
       if (err) {
@@ -32,9 +30,11 @@ export const getCaretakerInformation = async (req, res) => {
   try {
     const query = `
       SELECT *
-      FROM caretakernew ct
-      LEFT JOIN caretakerAddress cta ON ct.caretakerId = cta.caretakerId
-      LEFT JOIN caretakerMediCondition ctm ON ct.caretakerId = ctm.caretakerId
+      FROM requirement r
+      LEFT JOIN caretakernew ct 
+      ON r.caretakerId = ct.caretakerId
+      LEFT JOIN caretakermedicondition ctm
+      ON ct.caretakerId = ctm.caretakerId
     `;
 
     db.query(query, (err, results) => {
@@ -50,7 +50,6 @@ export const getCaretakerInformation = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 // Get caregivers from usernew and caregiver tables
 export const getCaregivers = async (req, res) => {
@@ -75,7 +74,6 @@ export const getCaregivers = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 // Get caretaker details by ID
 export const getCaretakerById = async (req, res) => {
