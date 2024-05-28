@@ -184,6 +184,8 @@ export const getCareTakerById = (req, res) => {
   });
 };
 
+//########################################################################################
+
 export const registerPatient = (req, res) => {
   console.log("backend data", req.body);
 
@@ -197,7 +199,6 @@ export const registerPatient = (req, res) => {
     mediCondition,
     emergCont,
     category,
-    preffGender,
     userId,
   } = req.body;
 
@@ -218,7 +219,7 @@ export const registerPatient = (req, res) => {
       if (results.length > 0) {
         const caretakerId = results[0].caretakerId;
         db.query(
-          "UPDATE caretakernew SET firstName = ?, lastName = ?, dob = ?, mobileNo = ?, emergCont = ?, category = ?, preffGender = ? WHERE caretakerId = ?",
+          "UPDATE caretakernew SET firstName = ?, lastName = ?, dob = ?, mobileNo = ?, emergCont = ?, category = ?,  WHERE caretakerId = ?",
           [
             firstName,
             lastName,
@@ -226,7 +227,6 @@ export const registerPatient = (req, res) => {
             mobileNo,
             emergCont,
             category,
-            preffGender,
             caretakerId,
           ],
           (err) => {
@@ -261,7 +261,7 @@ export const registerPatient = (req, res) => {
         );
       } else {
         db.query(
-          "INSERT INTO caretakernew (firstName, lastName, nationalId, dob, mobileNo, emergCont, category, preffGender, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+          "INSERT INTO caretakernew (firstName, lastName, nationalId, dob, mobileNo, emergCont, category, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
           [
             firstName,
             lastName,
@@ -270,7 +270,6 @@ export const registerPatient = (req, res) => {
             mobileNo,
             emergCont,
             category,
-            preffGender,
             userId,
           ],
           (err, results) => {
