@@ -1,11 +1,11 @@
 import express from 'express';
-import { getCaretakers, getCaretakerInformation, getCaregivers } from '../Controller/managerController.js';
+import {  getCaretakerInformation, getCaregivers, getCaretakerById } from '../Controller/managerController.js';
 
 const router = express.Router();
 
-router.get('/getCaretakers', getCaretakers);
+
 router.get('/getCaretakerInformation', getCaretakerInformation);
-// router.get('/caretakerInformation/:id', getCaretakerInformation);
-router.get('/caregivers', getCaregivers);
+router.get('/getCaretakerById/:id', getCaretakerById);
+router.get('/getCaregivers', getCaregivers);
 
 export default router;

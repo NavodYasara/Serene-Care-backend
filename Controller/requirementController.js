@@ -2,24 +2,24 @@ import { db } from "../server.js";
 
 //##############  Controller function to insert details into the requirement table of the database ###############################
 
-// export const insertRequirement = (req, res) => {
-//   const { requirement, startDate, endDate, mediCondition, prefGender } = req.body;
+export const insertRequirement = (req, res) => {
+  const { requirement, startDate, endDate, prefGender } = req.body;
 
-//   db.query(
-//     "INSERT INTO requirement (requirement, startDate, endDate, mediCondition,prefGender) VALUES (?, ?, ?, ?, ?)",
-//     [requirement, startDate, endDate, prefGender],
-//     (err, results) => {
-//       if (err) {
-//         console.error("Error during requirement insertion:", err);
-//         return res
-//           .status(500)
-//           .json({ error: "Internal Server Error", details: err.message });
-//       }
+  db.query(
+    "INSERT INTO requirement (requirement, startDate, endDate, preffGender) VALUES (?, ?, ?, ?)",
+    [requirement, startDate, endDate, prefGender],
+    (err, results) => {
+      if (err) {
+        console.error("Error during requirement insertion:", err);
+        return res
+          .status(500)
+          .json({ error: "Internal Server Error", details: err.message });
+      }
 
-//       res.status(201).json({ message: "Requirement inserted successfully" });
-//     }
-//   );
-// };
+      res.status(201).json({ message: "Requirement inserted successfully" });
+    }
+  );
+};
 
 
 export const insertRequest = (req, res) => {
@@ -50,8 +50,8 @@ export const insertRequest = (req, res) => {
 
       // Now, insert the requirements into the caretakerrequirement table with the obtained caretakerId
       db.query(
-        "INSERT INTO requirement (startDate, endDate, requirement, caretakerId) VALUES (?,?,?, ?)",
-        [startDate, endDate, requirement, caretakerId],
+        "INSERT INTO requirement (startDate, endDate, requirement, caretakerId, preffGender) VALUES (?,?,?,?,?)",
+        [startDate, endDate, requirement, caretakerId, preffGender],
         (err, results) => {
           if (err) {
             console.error("Error during requirement insertion:", err);
