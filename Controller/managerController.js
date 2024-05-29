@@ -55,7 +55,9 @@ export const getCaregivers = async (req, res) => {
 // Get caretaker details by ID
 export const getCaretakerById = async (req, res) => {
   try {
+
     const caretakerId = req.params.caretakerId;
+    
     const query = `
       SELECT 
           ct.*, 

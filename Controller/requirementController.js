@@ -3,11 +3,13 @@ import { db } from "../server.js";
 //##############  Controller function to insert details into the requirement table of the database ###############################
 
 export const insertRequirement = (req, res) => {
-  const { requirement, startDate, endDate, prefGender } = req.body;
+  
+  const { requirement, startDate, endDate, preffGender, status, userId, caretakerId } = req.body;
+
 
   db.query(
-    "INSERT INTO requirement (requirement, startDate, endDate, preffGender) VALUES (?, ?, ?, ?)",
-    [requirement, startDate, endDate, prefGender],
+    "INSERT INTO requirement (requirement, startDate, endDate, preffGender, status, userId, caretakerId) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    [requirement, startDate, endDate, preffGender, status, userId, caretakerId],
     (err, results) => {
       if (err) {
         console.error("Error during requirement insertion:", err);
@@ -67,6 +69,15 @@ export const insertRequest = (req, res) => {
   );
 };
 
+export const getAllcaretakers = (req, res) => {
+  db.query("SELECT * FROM caretakernew", (err, results) => {
+    if (err) {
+      console.error("Error fetching caretakers:", err.message);
+      return res.status(500).json({ error: "Internal Server Error", details: err.message });
+    }
+    res.json(results);
+  });
+}
 
 
 

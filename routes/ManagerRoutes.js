@@ -5,7 +5,7 @@ const router = express.Router();
 
 
 router.get('/getCaretakerInformation', getCaretakerInformation);
-router.get('/getCaretakerById/:id', getCaretakerById);
+router.get('/getCaretakerById/:caretakerId', getCaretakerById);
 router.get('/getCaregivers', getCaregivers);
 
 export default router;
