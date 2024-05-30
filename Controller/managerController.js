@@ -90,6 +90,29 @@ export const getCaretakerById = async (req, res) => {
   }
 };
 
+export const allocateCaregiver = async (req, res) => {
+  try {
+    const { caretakerId, caregiverId, status } = req.body;
+    const query = `
+      UPDATE requirement
+      SET caregiverId = ?, status = ?
+      WHERE caretakerId = ?
+    `;
+
+    db.query(query, [caregiverId, status, caretakerId], (err, results) => {
+      if (err) {
+        console.error(err.message);
+        res.status(500).json({ error: err.message });
+      } else {
+        res.json({ message: "Caregiver allocated successfully!" });
+      }
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: error.message });
+  }
+}
+
 // Get caregiver details by ID (you'll need a caregiverId from the dropdown)
 // export const getCaregiverById = async (req, res) => {
 //   try {
