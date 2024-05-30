@@ -5,9 +5,11 @@ import cors from 'cors';
 import loginRoutes from './routes/userRoutes.js';
 import requirementRoutes from './routes/requirementRoutes.js';
 import managerRoutes from './routes/managerRoutes.js';
+import caregiverRoutes from './routes/caregiverRoutes.js';
 // import careplanRoutes from './routes/careplanRoutes.js';
 // import reportRoutes from './routes/reportRoutes.js';
 // import paymentRoutes from './routes/paymentRoutes.js';
+
 
 // Create an Express application as middleware
 const app = express();
@@ -38,6 +40,7 @@ db.connect((err) => {
 app.use('/api/user', loginRoutes);
 app.use('/api/requirement', requirementRoutes);
 app.use('/api/manager', managerRoutes);
+app.use('/api/caregiver', caregiverRoutes);
 // app.use('/api/report', reportRoutes);
 // app.use('/api/payment', paymentRoutes);
 
