@@ -27,31 +27,6 @@ export const getCaretakerInformation = async (req, res) => {
   }
 };
 
-// Get caregivers from usernew and caregiver tables
-export const getCaregivers = async (req, res) => {
-  try {
-    
-    const query = `
-      SELECT *
-      FROM usernew u
-      JOIN caregiver cg ON u.userId = cg.userId
-      WHERE u.userType = 'Caregiver' AND cg.availability = 'AVAILABLE'
-    `;
-
-    db.query(query, (err, results) => {
-      if (err) {
-        console.error(err.message);
-        res.status(500).json({ error: err.message });
-      } else {
-        res.json(results);
-      }
-    });
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).json({ error: error.message });
-  }
-};
-
 // Get caretaker details by ID
 export const getCaretakerById = async (req, res) => {
   try {
@@ -90,50 +65,106 @@ export const getCaretakerById = async (req, res) => {
   }
 };
 
-export const allocateCaregiver = async (req, res) => {
+// Get caregivers from usernew and caregiver tables to the caregier information section
+export const getCaregivers = async (req, res) => {
+   try {
+    const query = `SELECT * FROM usernew u JOIN caregiver cg ON u.userId = cg.userId WHERE u.userType = 'Caregiver' AND cg.availability = 'AVAILABLE'`;
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error(err.message);
+        res.status(500).json({ error: err.message }); // Send an error response
+      } else {
+        res.status(200).json(results); // Ensure correct Content-Type and complete JSON
+      }
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: error.message }); // Send an error response
+  }
+};
+
+// Get caregiver details by ID
+export const getCaregiverById = async (req, res) => {
+  const caregiverId = req.params.caregiverId;
+  console.log(req.params.caregiverId);
   try {
-    const { caretakerId, caregiverId, status } = req.body;
+    
     const query = `
-      UPDATE requirement
-      SET caregiverId = ?, status = ?
-      WHERE caretakerId = ?
+      SELECT *
+      FROM usernew u
+      JOIN caregiver cg ON u.userId = cg.userId
+      WHERE u.userId = ? AND u.userType = 'Caregiver'
     `;
 
-    db.query(query, [caregiverId, status, caretakerId], (err, results) => {
+
+    db.query(query, [caregiverId], (err, results) => {
       if (err) {
         console.error(err.message);
         res.status(500).json({ error: err.message });
       } else {
-        res.json({ message: "Caregiver allocated successfully!" });
+        res.json(results[0]);
       }
     });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: error.message });
   }
-}
+};
 
-// Get caregiver details by ID (you'll need a caregiverId from the dropdown)
-// export const getCaregiverById = async (req, res) => {
+// Allocate a caregiver to a caretaker
+// export const allocateCaregiver = async (req, res) => {
 //   try {
-//     const caregiverId = req.params.id;
+//     const { caretakerId, caregiverId, requirementId, instruction } = req.body;
+
 //     const query = `
-//       SELECT *
-//       FROM usernew u
-//       JOIN caregiver cg ON u.userId = cg.userId
-//       WHERE u.userId = ? AND u.userType = 'Caregiver'
+//       INSERT INTO carePlan (caretakerId, caregiverId, requirementId, status, instruction)
+//       VALUES (?, ?, ?, 'Assigned', ?)
 //     `;
 
-//     db.query(query, [caregiverId], (err, results) => {
-//       if (err) {
-//         console.error(err.message);
-//         res.status(500).json({ error: err.message });
-//       } else {
-//         res.json(results[0]);
+//     db.query(
+//       query,
+//       [caretakerId, caregiverId, requirementId, instruction],
+//       (err, results) => {
+//         if (err) {
+//           console.error(err.message);
+//           res.status(500).json({ error: err.message });
+//         } else {
+//           res.json({ message: "Caregiver allocated successfully!" });
+//         }
 //       }
-//     });
+//     );
 //   } catch (error) {
 //     console.error(error.message);
 //     res.status(500).json({ error: error.message });
 //   }
 // };
+
+// Allocate a caregiver to a caretaker
+
+export const allocateCaregiver = async (req, res) => {
+  try {
+    const { caretakerId, caregiverId, requirementId, instruction } = req.body;
+
+    const query = `
+      INSERT INTO careplan (caretakerId, caregiverId, requirementId, status, instruction)
+      VALUES (?, ?, ?, 'Accepted', ?)
+      ON DUPLICATE KEY UPDATE caretakerId = VALUES(caretakerId), caregiverId = VALUES(caregiverId), instruction = VALUES(instruction)
+    `;
+
+    db.query(
+      query,
+      [caretakerId, caregiverId, requirementId, instruction],
+      (err, results) => {
+        if (err) {
+          console.error(err.message);
+          res.status(500).json({ error: err.message });
+        } else {
+          res.json({ message: "Caregiver allocated successfully!" });
+        }
+      }
+    );
+} catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: error.message });
+}
+};
