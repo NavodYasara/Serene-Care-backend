@@ -23,7 +23,7 @@ export const getCaretakerInformation = async (req, res) => {
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });    
   }
 };
 
@@ -91,6 +91,7 @@ export const getCaregiverById = async (req, res) => {
       SELECT *
       FROM usernew u
       JOIN caregiver cg ON u.userId = cg.userId
+      JOIN caregiveraddress cga ON cg.caregiverId = cga.caregiverId
       WHERE cg.caregiverId = ?
     `;
 
@@ -110,10 +111,6 @@ export const getCaregiverById = async (req, res) => {
   }
 };
 
-
-
-
-// Allocate a caregiver to a caretaker
 
 // export const allocateCaregiver = async (req, res) => {
 //   try {

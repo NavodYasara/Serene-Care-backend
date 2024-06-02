@@ -83,7 +83,6 @@ export const getAllcaretakers = (req, res) => {
 
 //##############  Controller function to insert require data to the database  ###############################
 
-
 // export const insertRequest = async (req, res) => {
 //   const { startDate, endDate, preferredGender, userId , requirement} = req.body;
 
@@ -144,6 +143,7 @@ export const getAllcaretakers = (req, res) => {
 
 
 //##############  Controller function to fetch all requirements from the database ###############################
+
 export const getAllRequirements = (req, res) => {
     db.query("SELECT * FROM requirement", (err, results) => {
         if (err) {
