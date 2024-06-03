@@ -169,12 +169,12 @@ export const allocateCaregiver = async (req, res) => {
         const query = results.length > 0
           ? `
             UPDATE careplan
-            SET caretakerId = ?, caregiverId = ?, status = 'Accepted', instruction = ?, category = ?
+            SET caretakerId = ?, caregiverId = ?, status = 'PENDING', instruction = ?, category = ?
             WHERE requirementId = ?
-          `
+          ` 
           : `
             INSERT INTO careplan (caretakerId, caregiverId, requirementId, status, instruction, category)
-            VALUES (?, ?, ?, 'Accepted', ?, ?)
+            VALUES (?, ?, ?, 'PENDING', ?, ?)
           `;
 
         db.query(
