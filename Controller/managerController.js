@@ -166,7 +166,8 @@ export const allocateCaregiver = async (req, res) => {
         }
 
         // If a row with the relevant requirementId exists, update it. Otherwise, insert a new row.
-        const query = results.length > 0
+        const isUpdate = results.length > 0;
+        const query = isUpdate
           ? `
             UPDATE careplan
             SET caretakerId = ?, caregiverId = ?, status = 'PENDING', instruction = ?, category = ?
@@ -185,7 +186,8 @@ export const allocateCaregiver = async (req, res) => {
               console.error(err.message);
               res.status(500).json({ error: err.message });
             } else {
-              res.json({ message: "Caregiver allocated successfully!" });
+              const message = isUpdate ? "Careplan updated successfully!" : "Caregiver allocated successfully!";
+              res.json({ message });
             }
           }
         );
