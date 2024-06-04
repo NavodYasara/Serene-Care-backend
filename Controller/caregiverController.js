@@ -25,34 +25,6 @@ export const getrequestedcaretakers = (req, res) => {
   }
 };
 
-export const assignedcaretakers = (req, res) => {
-  const { caregiverId } = req.query;
-  console.log("incoming params ", caregiverId);
-
-  try {
-    db.query(
-      `SELECT requirement.*, careplan.* 
-       FROM requirement 
-       INNER JOIN careplan ON careplan.requirementId = requirement.requirementId 
-       WHERE careplan.caregiverId = (SELECT caregiver.caregiverId FROM caregiver WHERE caregiver.userId = ?)`,
-      [caregiverId],
-      (err, results) => {
-        if (err) {
-          console.error("Error connecting to MySQL:", err);
-          res.status(500).send("Error fetching data from database.");
-          return;
-        } else {
-          console.log("care giver result ", results);
-          res.json(results);
-        }
-      }
-    );
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).send("Internal server error.");
-  }
-};
-
 
 export const acceptrequest = (req, res) => {
   const caretakerId = req.params.caretakerId;
@@ -105,6 +77,34 @@ export const acceptrequest = (req, res) => {
   }
 };
 
+export const assignedcaretakers = (req, res) => {
+  const { caregiverId } = req.query;
+  console.log("incoming params ", caregiverId);
+
+  try {
+    db.query(
+      `SELECT requirement.*, careplan.*, caretakernew.category 
+       FROM requirement 
+       INNER JOIN careplan ON careplan.requirementId = requirement.requirementId 
+       INNER JOIN caretakernew ON requirement.caretakerId = caretakernew.caretakerId
+       WHERE careplan.caregiverId = (SELECT caregiver.caregiverId FROM caregiver WHERE caregiver.userId = ?)`,
+      [caregiverId],
+      (err, results) => {
+        if (err) {
+          console.error("Error connecting to MySQL:", err);
+          res.status(500).send("Error fetching data from database.");
+          return;
+        } else {
+          console.log("care giver result ", results);
+          res.json(results);
+        }
+      }
+    );
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Internal server error.");
+  }
+};
 
 // import { db } from "../server.js";
 
@@ -333,3 +333,6 @@ export const acceptrequest = (req, res) => {
 // //     res.status(500).send("Internal server error.");
 // //   }
 // // };
+
+
+
