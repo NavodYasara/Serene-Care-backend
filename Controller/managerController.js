@@ -179,7 +179,7 @@ export const allocateCaregiver = async (req, res) => {
 
         db.query(
           query,
-          [caretakerId, caregiverId, requirementId, instruction, category],
+          [caretakerId, caregiverId, requirementId, status, instruction, category],
           (err, results) => {
             if (err) {
               console.error(err.message);
@@ -196,6 +196,11 @@ export const allocateCaregiver = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Get all the allocated caregivers for a given caretaker
+
+
+
 
 
 
