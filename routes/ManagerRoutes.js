@@ -1,5 +1,12 @@
 import express from 'express';
-import {  getCaretakerInformation, getCaregivers, getCaretakerById, allocateCaregiver, getCaregiverById} from '../Controller/managerController.js';
+import {
+  getCaretakerInformation,
+  getCaregivers,
+  getCaretakerById,
+  allocateCaregiver,
+  getCaregiverById,
+  handleinstruction,
+} from "../Controller/managerController.js";
 
 
 
@@ -10,5 +17,6 @@ router.get('/getCaretakerById/:caretakerId', getCaretakerById);
 router.get('/getCaregivers', getCaregivers);
 router.put('/allocateCaregiver', allocateCaregiver);
 router.get("/getCaregiverById/:caregiverId", getCaregiverById);
+router.put('/handleinstruction', handleinstruction);
 
 export default router;

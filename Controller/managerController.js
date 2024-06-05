@@ -171,6 +171,24 @@ export const allocateCaregiver = async (req, res) => {
   }
 };
 
+export const handleinstruction = async (req, res) => {
+  try {
+    const { instruction, requirementId } = req.body
+    const query = `update careplan set instruction = ? where requirementId = ?`;
+    db.query(query, [instruction, requirementId], (err, results) => {
+      if (err) {
+        console.error(err.message);
+        res.status(500).json({ error: err.message });
+      } else {
+        res.json({ message: "Instruction updated successfully!" });
+      }
+    });
+  }
+  catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
 
 
 
