@@ -41,6 +41,7 @@ app.use('/api/user', loginRoutes);
 app.use('/api/requirement', requirementRoutes);
 app.use('/api/manager', managerRoutes);
 app.use('/api/caregiver', caregiverRoutes);
+// app.use('/api/careplan', careplanRoutes);
 // app.use('/api/report', reportRoutes);
 // app.use('/api/payment', paymentRoutes);
 

@@ -57,7 +57,7 @@ export const acceptrequest = (req, res) => {
             }
 
             db.query(
-              "UPDATE careplan SET status = 'ACCEPTED' WHERE caretakerId = ?",
+              "UPDATE careplan SET status = 'Assaigned' WHERE caretakerId = ?",
               [caretakerId],
               (err, results) => {
                 if (err) {
