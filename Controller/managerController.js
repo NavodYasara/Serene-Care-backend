@@ -141,66 +141,114 @@ export const getCaregiverById = async (req, res) => {
 // };
 
 
+// export const allocateCaregiver = async (req, res) => {
+//   try {
+//     const { caretakerId, caregiverId, requirementId, status, instruction } = req.body;
+
+//     // Fetch the category for the given caretakerId
+//     const categoryQuery = `SELECT category FROM caretakernew WHERE caretakerId = ?`;
+//     db.query(categoryQuery, [caretakerId], (err, results) => {
+//       if (err) {
+//         console.error(err.message);
+//         res.status(500).json({ error: err.message });
+//         return;
+//       }
+
+//       const category = results[0].category;
+
+//       // Check if a row with the relevant requirementId exists in the careplan table
+//       const checkQuery = `SELECT * FROM careplan WHERE requirementId = ?`;
+//       db.query(checkQuery, [requirementId], (err, results) => {
+//         if (err) {
+//           console.error(err.message);
+//           res.status(500).json({ error: err.message });
+//           return;
+//         }
+
+//         // If a row with the relevant requirementId exists, update it. Otherwise, insert a new row.
+//         const isUpdate = results.length > 0;
+//         const query = isUpdate
+//           ? `
+//             UPDATE careplan
+//             SET caretakerId = ?, caregiverId = ?, status = 'PENDING', instruction = ?, category = ?
+//             WHERE requirementId = ?
+//           ` 
+//           : `
+//             INSERT INTO careplan (caretakerId, caregiverId, requirementId, status, instruction, category)
+//             VALUES (?, ?, ?, 'PENDING', ?, ?)
+//           `;
+
+//         db.query(
+//           query,
+//           [caretakerId, caregiverId, requirementId, status, instruction, category],
+//           (err, results) => {
+//             if (err) {
+//               console.error(err.message);
+//               res.status(500).json({ error: err.message });
+//             } else {
+//               const message = isUpdate ? "Careplan updated successfully!" : "Caregiver allocated successfully!";
+//               res.json({ message });
+//             }
+//           }
+//         );
+//       });
+//     });
+//   } catch (error) {
+//     console.error(error.message);
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
+
 export const allocateCaregiver = async (req, res) => {
   try {
     const { caretakerId, caregiverId, requirementId, status, instruction } = req.body;
 
-    // Fetch the category for the given caretakerId
-    const categoryQuery = `SELECT category FROM caretakernew WHERE caretakerId = ?`;
-    db.query(categoryQuery, [caretakerId], (err, results) => {
+    // Check if the requirement status is 'Accepted'
+    const requirementStatusQuery = `SELECT status FROM requirement WHERE requirementId = ?`;
+    db.query(requirementStatusQuery, [requirementId], (err, results) => {
       if (err) {
         console.error(err.message);
         res.status(500).json({ error: err.message });
         return;
       }
 
-      const category = results[0].category;
+      const requirementStatus = results[0].status;
 
-      // Check if a row with the relevant requirementId exists in the careplan table
-      const checkQuery = `SELECT * FROM careplan WHERE requirementId = ?`;
-      db.query(checkQuery, [requirementId], (err, results) => {
-        if (err) {
-          console.error(err.message);
-          res.status(500).json({ error: err.message });
-          return;
-        }
+      // Update or insert into careplan table
+      const isUpdate = results.length > 0;
+      const query = isUpdate
+        ? `
+          UPDATE careplan
+          SET caretakerId = ?, caregiverId = ?, status = ?, instruction = ?
+          WHERE requirementId = ?
+        `
+        : `
+          INSERT INTO careplan (caretakerId, caregiverId, requirementId, status, instruction)
+          VALUES (?, ?, ?, ?, ?)
+        `;
 
-        // If a row with the relevant requirementId exists, update it. Otherwise, insert a new row.
-        const isUpdate = results.length > 0;
-        const query = isUpdate
-          ? `
-            UPDATE careplan
-            SET caretakerId = ?, caregiverId = ?, status = 'PENDING', instruction = ?, category = ?
-            WHERE requirementId = ?
-          ` 
-          : `
-            INSERT INTO careplan (caretakerId, caregiverId, requirementId, status, instruction, category)
-            VALUES (?, ?, ?, 'PENDING', ?, ?)
-          `;
+      const statusToUpdate = requirementStatus === 'Accepted' ? 'assigned' : status;
 
-        db.query(
-          query,
-          [caretakerId, caregiverId, requirementId, status, instruction, category],
-          (err, results) => {
-            if (err) {
-              console.error(err.message);
-              res.status(500).json({ error: err.message });
-            } else {
-              const message = isUpdate ? "Careplan updated successfully!" : "Caregiver allocated successfully!";
-              res.json({ message });
-            }
+      db.query(
+        query,
+        [caretakerId, caregiverId, requirementId, statusToUpdate, instruction],
+        (err, results) => {
+          if (err) {
+            console.error(err.message);
+            res.status(500).json({ error: err.message });
+          } else {
+            const message = isUpdate ? "Careplan updated successfully!" : "Caregiver allocated successfully!";
+            res.json({ message });
           }
-        );
-      });
+        }
+      );
     });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: error.message });
   }
 };
-
-// Get all the allocated caregivers for a given caretaker
-
 
 
 
