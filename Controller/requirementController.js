@@ -3,9 +3,15 @@ import { db } from "../server.js";
 //##############  Controller function to insert details into the requirement table of the database ###############################
 
 export const insertRequirement = (req, res) => {
-  
-  const { requirement, startDate, endDate, preffGender, status, userId, caretakerId } = req.body;
-
+  const {
+    requirement,
+    startDate,
+    endDate,
+    preffGender,
+    status,
+    userId,
+    caretakerId,
+  } = req.body;
 
   db.query(
     "INSERT INTO requirement (requirement, startDate, endDate, preffGender, status, userId, caretakerId) VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -22,7 +28,6 @@ export const insertRequirement = (req, res) => {
     }
   );
 };
-
 
 export const insertRequest = (req, res) => {
   console.log(req.body);
@@ -62,7 +67,9 @@ export const insertRequest = (req, res) => {
               .json({ error: "Internal Server Error", details: err.message });
           }
 
-          res.status(201).json({ message: "Requirement inserted successfully" });
+          res
+            .status(201)
+            .json({ message: "Requirement inserted successfully" });
         }
       );
     }
@@ -73,16 +80,52 @@ export const getAllcaretakers = (req, res) => {
   db.query("SELECT * FROM caretakernew", (err, results) => {
     if (err) {
       console.error("Error fetching caretakers:", err.message);
-      return res.status(500).json({ error: "Internal Server Error", details: err.message });
+      return res
+        .status(500)
+        .json({ error: "Internal Server Error", details: err.message });
     }
     res.json(results);
   });
-}
+};
 
-
+export const getAllRequirements = (req, res) => {
+  db.query(
+    `SELECT
+    r.status,
+    r.requirementId,
+    r.requirement,
+    r.startDate,
+    r.endDate,
+    r.caretakerId,
+    r.preffGender,
+    ct.category,
+    ct.userId,
+    ct.firstName,
+    ct.lastName,
+    ct.nationalId,
+    ct.mobileNo,
+    ct.dob,
+    ct.emergCont,
+    cta.address,
+    ctm.mediCondition
+    FROM
+    requirement r
+    JOIN caretakernew ct ON r.caretakerId = ct.caretakerId
+    JOIN caretakeraddress cta ON ct.caretakerId = cta.caretakerId
+    JOIN caretakermedicondition ctm ON ct.caretakerId = ctm.caretakerId;`,
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching requirements:", err.message);
+        return res
+          .status(500)
+          .json({ error: "Internal Server Error", details: err.message });
+      }
+      res.json(results);
+    }
+  );
+};
 
 //##############  Controller function to insert require data to the database  ###############################
-
 
 // export const insertRequest = async (req, res) => {
 //   const { startDate, endDate, preferredGender, userId , requirement} = req.body;
@@ -142,14 +185,50 @@ export const getAllcaretakers = (req, res) => {
 //   );
 // };
 
-
 //##############  Controller function to fetch all requirements from the database ###############################
-export const getAllRequirements = (req, res) => {
-    db.query("SELECT * FROM requirement", (err, results) => {
-        if (err) {
-            console.error("Error fetching requirements:", err.message);
-            return res.status(500).json({ error: "Internal Server Error", details: err.message });
-        }
-        res.json(results);
-    });
-};
+
+// export const getAllRequirements = (req, res) => {
+//     db.query("SELECT * FROM requirement", (err, results) => {
+//         if (err) {
+//             console.error("Error fetching requirements:", err.message);
+//             return res.status(500).json({ error: "Internal Server Error", details: err.message });
+//         }
+//         res.json(results);
+//     });
+// };
+
+// export const getAllRequirements = (req, res) => {
+//   db.query(
+//     `SELECT
+//     r.requirementId,
+//     r.requirement,
+//     r.startDate,
+//     r.endDate,
+//     r.caretakerId,
+//     r.preffGender,
+//     ct.category,
+//     ct.userId,
+//     ct.firstName,
+//     ct.lastName,
+//     ct.nationalId,
+//     ct.mobileNo,
+//     ct.dob,
+//     ct.emergCont,
+//     cta.address,
+//     ctm.mediCondition
+// FROM
+//     requirement r
+// JOIN caretakernew ct ON r.caretakerId = ct.caretakerId
+// JOIN caretakeraddress cta ON ct.caretakerId = cta.caretakerId
+// JOIN caretakermedicondition ctm ON ct.caretakerId = ctm.caretakerId;`,
+//     (err, results) => {
+//       if (err) {
+//         console.error("Error fetching requirements:", err.message);
+//         return res
+//           .status(500)
+//           .json({ error: "Internal Server Error", details: err.message });
+//       }
+//       res.json(results);
+//     }
+//   );
+// };
