@@ -6,8 +6,9 @@ import loginRoutes from './routes/userRoutes.js';
 import requirementRoutes from './routes/requirementRoutes.js';
 import managerRoutes from './routes/managerRoutes.js';
 import caregiverRoutes from './routes/caregiverRoutes.js';
-// import careplanRoutes from './routes/careplanRoutes.js';
-// import reportRoutes from './routes/reportRoutes.js';
+import feedback from './routes/feedbackRoutes.js';
+import careplanRoutes from './routes/careplanRoutes.js';
+import reportRoutes from './routes/reportRoutes.js';
 // import paymentRoutes from './routes/paymentRoutes.js';
 
 
@@ -41,7 +42,8 @@ app.use('/api/user', loginRoutes);
 app.use('/api/requirement', requirementRoutes);
 app.use('/api/manager', managerRoutes);
 app.use('/api/caregiver', caregiverRoutes);
-// app.use('/api/careplan', careplanRoutes);
+app.use('/api/feedback', feedback);
+app.use('/api/careplan', careplanRoutes);
 // app.use('/api/report', reportRoutes);
 // app.use('/api/payment', paymentRoutes);
 

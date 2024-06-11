@@ -6,6 +6,11 @@ import {
   allocateCaregiver,
   getCaregiverById,
   handleinstruction,
+  getAllPendingTasks,
+  updateCaregiverAndInstructions,
+  getAllAssignedAndRejectedTasks,
+  getFinalizedPlans,
+  
 } from "../Controller/managerController.js";
 
 
@@ -18,5 +23,9 @@ router.get('/getCaregivers', getCaregivers);
 router.put('/allocateCaregiver', allocateCaregiver);
 router.get("/getCaregiverById/:caregiverId", getCaregiverById);
 router.put('/handleinstruction', handleinstruction);
+router.get("/pendingTasks", getAllPendingTasks);
+router.post("/addCareGiverAndInstructions", updateCaregiverAndInstructions);
+router.get("/assignedAndRejected", getAllAssignedAndRejectedTasks);
+router.get("/finalizedPlans", getFinalizedPlans);
 
 export default router;
