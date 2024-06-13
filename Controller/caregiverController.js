@@ -267,7 +267,7 @@ export const getRequrimentRelatedToUserID = async (req, res) => {
     const requirementsWithCaretakerDetails = await Promise.all(
       requirementResults.map(async (requirement) => {
         const caretakerQuery =
-          "SELECT caretakernew.*, usernew.* FROM caretakernew INNER JOIN usernew ON usernew.userId=caretakernew.userId WHERE caretakernew.caretakerId=?";
+          "SELECT caretakernew.*,caretakernew.firstName as caretakerFirstName, caretakernew.lastName as caretakerLastName, usernew.* FROM caretakernew INNER JOIN usernew ON usernew.userId=caretakernew.userId WHERE caretakernew.caretakerId=?";
         const [caretakerResults] = await new Promise((resolve, reject) => {
           db.query(caretakerQuery, [requirement.caretakerId], (err, results) => {
             if (err) return reject(err);

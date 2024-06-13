@@ -4,24 +4,42 @@ import isBetween from "dayjs/plugin/isBetween.js";
 dayjs.extend(isBetween);
 
 // Get detailed caretaker information from both ct & ctAddress & ctMediCondition tables
-export const getCaretakerInformation = async (req, res) => {
-  try {
-    const query = `
-      SELECT *
-      FROM requirement r
-      LEFT JOIN caretakernew ct 
-      ON r.caretakerId = ct.caretakerId
-      LEFT JOIN caretakermedicondition ctm
-      ON ct.caretakerId = ctm.caretakerId
-      WHERE r.status = 'pending'
-    `;
+// export const getCaretakerInformation = async (req, res) => {
+//   try {
+//     const query = `
+//       SELECT *
+//       FROM requirement r
+//       LEFT JOIN caretakernew ct 
+//       ON r.caretakerId = ct.caretakerId
+//       LEFT JOIN caretakermedicondition ctm
+//       ON ct.caretakerId = ctm.caretakerId
+//       WHERE r.status = 'pending'
+//     `;
 
-    db.query(query, (err, results) => {
+//     db.query(query, (err, results) => {
+//       if (err) {
+//         console.error(err.message);
+//         res.status(500).json({ error: err.message });
+//       } else {
+//         res.json(results);
+//       }
+//     });
+//   } catch (error) {
+//     console.error(error.message);
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
+export const handleinstruction = async (req, res) => {
+  try {
+    const { instruction, requirementId } = req.body;
+    const query = `update careplan set instruction = ? where requirementId = ?`;
+    db.query(query, [instruction, requirementId], (err, results) => {
       if (err) {
         console.error(err.message);
         res.status(500).json({ error: err.message });
       } else {
-        res.json(results);
+        res.json({ message: "Instruction updated successfully!" });
       }
     });
   } catch (error) {
@@ -211,6 +229,8 @@ export const getCaregivers = async (req, res) => {
 //   }
 // };
 
+
+
 // Get caregiver details by ID
 export const getCaregiverById = async (req, res) => {
   const caregiverId = req.params.caregiverId;
@@ -303,16 +323,22 @@ export const allocateCaregiver = async (req, res) => {
   }
 };
 
-export const handleinstruction = async (req, res) => {
+
+// Get detailed caretaker information from requirement and caretakernew tables
+export const getCaretakerInformation = async (req, res) => {
   try {
-    const { instruction, requirementId } = req.body;
-    const query = `update careplan set instruction = ? where requirementId = ?`;
-    db.query(query, [instruction, requirementId], (err, results) => {
+    const query = `
+      SELECT ct.caretakerId, ct.firstName, ct.lastName, r.status, r.startDate, r.endDate
+      FROM requirement r
+      LEFT JOIN caretakernew ct ON r.caretakerId = ct.caretakerId
+    `;
+
+    db.query(query, (err, results) => {
       if (err) {
         console.error(err.message);
         res.status(500).json({ error: err.message });
       } else {
-        res.json({ message: "Instruction updated successfully!" });
+        res.json(results);
       }
     });
   } catch (error) {
@@ -320,7 +346,6 @@ export const handleinstruction = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 //#############################
 

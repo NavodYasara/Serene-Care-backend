@@ -1,6 +1,7 @@
 import express from 'express';
-import {} from '../Controller/careplanController.js';
+import {} from '../Controller/paymentController.js';
 
 const router = express.Router();
 
 
+export default router;

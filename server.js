@@ -9,7 +9,7 @@ import caregiverRoutes from './routes/caregiverRoutes.js';
 import feedback from './routes/feedbackRoutes.js';
 import careplanRoutes from './routes/careplanRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
-// import paymentRoutes from './routes/paymentRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
 
 
 // Create an Express application as middleware
@@ -44,8 +44,8 @@ app.use('/api/manager', managerRoutes);
 app.use('/api/caregiver', caregiverRoutes);
 app.use('/api/feedback', feedback);
 app.use('/api/careplan', careplanRoutes);
-// app.use('/api/report', reportRoutes);
-// app.use('/api/payment', paymentRoutes);
+app.use('/api/report', reportRoutes);
+app.use('/api/payment', paymentRoutes);
 
 // Define a route to retrieve all users
 app.get('/server/usernew', (req, res) => {

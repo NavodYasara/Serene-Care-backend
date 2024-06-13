@@ -177,8 +177,40 @@ export const addfeedback = (req, res) => {
 };
 
 
+// export const getFeedbackHistory = (req, res) => {
+//   const { userId } = req.params;
+
+//   try {
+//     // Query the feedback table to get the feedback data
+//     db.query(
+//       `SELECT 
+//           f.Date, 
+//           f.description
+//       FROM 
+//           feedback f
+//       WHERE 
+//           f.userId = ?;`,
+
+//       [userId],
+//       (err, feedbacks) => {
+//         if (err) {
+//           console.error("Error querying database:", err);
+//           return res.status(500).send("Error querying database.");
+//         }
+
+//         res.status(200).json(feedbacks);
+//       }
+//     );
+//   } catch (error) {
+//     console.error("Error querying database:", error);
+//     return res.status(500).send("Error querying database.");
+//   }
+// };
+
+
 export const getFeedbackHistory = (req, res) => {
-  const { userId } = req.params;
+  const requirementId  = req.params.requirmentId;
+  console.log(requirementId);
 
   try {
     // Query the feedback table to get the feedback data
@@ -189,9 +221,9 @@ export const getFeedbackHistory = (req, res) => {
       FROM 
           feedback f
       WHERE 
-          f.userId = ?;`,
+          f.requirementId = ?;`,
 
-      [userId],
+      [requirementId],
       (err, feedbacks) => {
         if (err) {
           console.error("Error querying database:", err);
@@ -206,5 +238,4 @@ export const getFeedbackHistory = (req, res) => {
     return res.status(500).send("Error querying database.");
   }
 };
-
 
