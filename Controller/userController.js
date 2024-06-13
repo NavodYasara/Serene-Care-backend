@@ -213,7 +213,9 @@ export const registerPatient = (req, res) => {
     (err, results) => {
       if (err) {
         console.error("Error during registration:", err);
-        return res.status(500).json({ error: "Internal Server Error", details: err.message });
+        return res
+          .status(500)
+          .json({ error: "Internal Server Error", details: err.message });
       }
 
       if (results.length > 0) {
@@ -243,12 +245,10 @@ export const registerPatient = (req, res) => {
               (err) => {
                 if (err) {
                   console.error("Error during address update:", err);
-                  return res
-                    .status(500)
-                    .json({
-                      error: "Internal Server Error",
-                      details: err.message,
-                    });
+                  return res.status(500).json({
+                    error: "Internal Server Error",
+                    details: err.message,
+                  });
                 }
 
                 db.query(
@@ -257,12 +257,10 @@ export const registerPatient = (req, res) => {
                   (err) => {
                     if (err) {
                       console.error("Error during mediCondition update:", err);
-                      return res
-                        .status(500)
-                        .json({
-                          error: "Internal Server Error",
-                          details: err.message,
-                        });
+                      return res.status(500).json({
+                        error: "Internal Server Error",
+                        details: err.message,
+                      });
                     }
                     return res
                       .status(200)
@@ -289,7 +287,9 @@ export const registerPatient = (req, res) => {
           (err, results) => {
             if (err) {
               console.error("Error during registration:", err);
-              return res.status(500).json({ error: "Internal Server Error", details: err.message });
+              return res
+                .status(500)
+                .json({ error: "Internal Server Error", details: err.message });
             }
 
             const caretakerId = results.insertId;
@@ -300,7 +300,12 @@ export const registerPatient = (req, res) => {
               (err) => {
                 if (err) {
                   console.error("Error during address data insertion:", err);
-                  return res.status(500).json({ error: "Internal Server Error", details: err.message });
+                  return res
+                    .status(500)
+                    .json({
+                      error: "Internal Server Error",
+                      details: err.message,
+                    });
                 }
 
                 db.query(
@@ -308,10 +313,22 @@ export const registerPatient = (req, res) => {
                   [mediCondition, caretakerId],
                   (err) => {
                     if (err) {
-                      console.error("Error during mediCondition data insertion:", err);
-                      return res.status(500).json({ error: "Internal Server Error", details: err.message });
+                      console.error(
+                        "Error during mediCondition data insertion:",
+                        err
+                      );
+                      return res
+                        .status(500)
+                        .json({
+                          error: "Internal Server Error",
+                          details: err.message,
+                        });
                     }
-                    return res.status(201).json({ message: "Caregiver data registered successfully" });
+                    return res
+                      .status(201)
+                      .json({
+                        message: "Caregiver data registered successfully",
+                      });
                   }
                 );
               }
@@ -323,16 +340,82 @@ export const registerPatient = (req, res) => {
   );
 };
 
+// export const getCaretakerData = (req, res) => {
+//   const userId = req.query.userId;
+
+//   db.query(
+//     "SELECT * FROM caretakernew WHERE userId = ?",
+//     [userId],
+//     (err, results) => {
+//       if (err) {
+//         console.error("Error fetching caretaker data:", err);
+//         return res.status(500).json({ error: "Internal Server Error" });
+//       }
+
+//       if (results.length === 0) {
+//         return res.status(404).json({ error: "Caretaker not found" });
+//       }
+
+//       const caretaker = results[0];
+
+//       db.query(
+//         // "SELECT * FROM useraddress WHERE userId = ?",
+//         "SELECT * FROM caretakeraddress WHERE userId = ?",
+//         [userId],
+//         (err, addressResults) => {
+//           if (err) {
+//             console.error("Error fetching caretaker address:", err);
+//             return res.status(500).json({ error: "Internal Server Error" });
+//           }
+
+//           db.query(
+//             "SELECT * FROM caretakermedicondition WHERE userId = ?",
+//             [userId],
+//             (err, mediConditionResults) => {
+//               if (err) {
+//                 console.error(
+//                   "Error fetching caretaker medical condition:",
+//                   err
+//                 );
+//                 console.error("Error fetching caretaker address:", err);
+//                 return res.status(500).json({ error: "Internal Server Error" });
+//               }
+
+//               const response = {
+//                 ...caretaker,
+//                 address:
+//                   addressResults.length > 0 ? addressResults[0].address : "",
+//                 mediCondition:
+//                   mediConditionResults.length > 0
+//                     ? mediConditionResults[0].mediCondition
+//                     : "",
+//               };
+
+//               return res.status(200).json(response);
+//             }
+//           );
+//         }
+//       );
+//     }
+//   );
+// };
 
 export const getCaretakerData = (req, res) => {
   const userId = req.query.userId;
 
+  // Step 1: Retrieve relevant details using userId
   db.query(
-    "SELECT * FROM caretakernew WHERE userId = ?",
+    // `SELECT ctm.*, ct.*, u.*
+    //  FROM caretakermedicondition ctm
+    //  JOIN caretakernew ct ON ctm.caretakerId = ct.caretakerId
+    //  JOIN usernew u ON ct.userId = u.userId
+    //  WHERE u.userId = ?`,
+    'SELECT  ctm.mediCondition, cta.address, ct.caretakerId, ct.category, u.userId, ct.firstName, ct.lastName, ct.medicareNumber, ct.mobileNo, ct.dob, ct.emergCont FROM caretakermedicondition ctm JOIN caretakernew ct ON ctm.caretakerId = ct.caretakerId JOIN caretakeraddress cta ON cta.caretakerId=ct.caretakerId JOIN usernew u ON ct.userId = u.userId WHERE u.userId= ?',
+
     [userId],
     (err, results) => {
       if (err) {
-        console.error("Error fetching caretaker data:", err);
+        console.error("Error fetching caretaker details:", err);
         return res.status(500).json({ error: "Internal Server Error" });
       }
 
@@ -340,20 +423,26 @@ export const getCaretakerData = (req, res) => {
         return res.status(404).json({ error: "Caretaker not found" });
       }
 
-      const caretaker = results[0];
+      const caretakerDetails = results[0];
+      const caretakerId = caretakerDetails.caretakerId;
 
+      // Step 2: Retrieve address using caretakerId
       db.query(
-        "SELECT * FROM useraddress WHERE userId = ?",
-        [userId],
+        "SELECT address FROM caretakeraddress WHERE caretakerId = ?",
+        [caretakerId],
         (err, addressResults) => {
           if (err) {
             console.error("Error fetching caretaker address:", err);
             return res.status(500).json({ error: "Internal Server Error" });
           }
 
+          const address =
+            addressResults.length > 0 ? addressResults[0].address : "";
+
+          // Step 3: Retrieve medical condition using caretakerId
           db.query(
-            "SELECT * FROM caretakermedicondition WHERE userId = ?",
-            [userId],
+            "SELECT medicondition FROM caretakermedicondition WHERE caretakerId = ?",
+            [caretakerId],
             (err, mediConditionResults) => {
               if (err) {
                 console.error(
@@ -363,14 +452,16 @@ export const getCaretakerData = (req, res) => {
                 return res.status(500).json({ error: "Internal Server Error" });
               }
 
+              const mediCondition =
+                mediConditionResults.length > 0
+                  ? mediConditionResults[0].medicondition
+                  : "";
+
+              // Combine all details into the response
               const response = {
-                ...caretaker,
-                address:
-                  addressResults.length > 0 ? addressResults[0].address : "",
-                mediCondition:
-                  mediConditionResults.length > 0
-                    ? mediConditionResults[0].mediCondition
-                    : "",
+                ...caretakerDetails,
+                address: address,
+                mediCondition: mediCondition,
               };
 
               return res.status(200).json(response);
@@ -383,9 +474,8 @@ export const getCaretakerData = (req, res) => {
 };
 
 
-
 // export const getCaretakerData = (req, res) => {
-  
+
 //   const userId = req.query.userId;
 
 //   db.query("SELECT * FROM caretakernew WHERE userId = ?", [userId], (err, results) => {
@@ -423,4 +513,3 @@ export const getCaretakerData = (req, res) => {
 //     });
 //   });
 // };
-

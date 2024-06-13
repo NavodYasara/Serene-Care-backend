@@ -150,10 +150,15 @@ export const requirementsAssignedToEachCaretaker = (req, res) => {
 export const requirementsCompletedByEachCaretaker = (req, res) => {
   try {
     const query = `
-            SELECT caregiverId, COUNT(*) AS completed_requirements
-            FROM requirement
-            WHERE status = 'finished'
-            GROUP BY caregiverId;
+      SELECT CONCAT(u.firstName, ' ', u.lastName) AS caregiver_name,
+      cg.caregiverId,
+      COUNT(r.requirementId) AS completed_requirements
+      FROM requirement r
+      JOIN caregiver cg ON r.caregiverId = cg.caregiverId
+      JOIN usernew u ON cg.userId = u.userId
+      WHERE r.status = 'finished'
+      GROUP BY cg.caregiverId, caregiver_name;
+
         `;
 
     db.query(query, (error, results) => {
