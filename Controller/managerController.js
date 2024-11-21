@@ -1,4 +1,4 @@
-import { db } from "../server.js";
+import db from "../db/db.js";
 
 // Get all caretakers from caretakrenew the table
 export const getCaretakers = async (req, res) => {

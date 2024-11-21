@@ -1,4 +1,5 @@
-import { db } from "../server.js";
+import db from "../db/db.js";
+
 
 
 export const getpatientDetails = (req, res) => {

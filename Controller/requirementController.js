@@ -1,4 +1,4 @@
-import { db } from "../server.js";
+import db from "../db/db.js";
 
 //##############  Controller function to insert details into the requirement table of the database ###############################
 

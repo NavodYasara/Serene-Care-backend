@@ -1,99 +1,56 @@
 import bcrypt from "bcrypt";
-import { db } from "../server.js";
+import db from "../db/db.js";
 
-export const registerCaretaker = (req, res) => {
-  const { firstName, lastName, userName, password, mobileNo, dob, address } =
-    req.body;
-  const userType = "caretaker";
 
-  if (!userName || !password) {
-    return res
-      .status(400)
-      .json({ error: "User Name and password are required" });
-  }
+export const userRegister = async (req, res) => {
+  const { firstName, lastName, email, password, confirmPassword, mobileNo, userType } = req.body;
 
-  bcrypt.hash(password, 10, (err, hash) => {
-    if (err) {
-      console.error("Error during registration:", err);
-      return res
-        .status(500)
-        .json({ error: "Internal Server Error", details: err.message });
+  try {
+    // Validate inputs
+    if (!firstName || !lastName || !email || !password || !confirmPassword || !userType) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+    if (password !== confirmPassword) {
+      return res.status(400).json({ error: "Passwords do not match" });
     }
 
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert the new user into the database
     db.query(
-      "SELECT * FROM usernew WHERE userName = ? AND userType = ?",
-      [userName, userType],
+      'INSERT INTO user (firstName, lastName, email, password, mobileNo, userType) VALUES (?, ?, ?, ?, ?, ?)',
+      [firstName, lastName, email, hashedPassword, mobileNo, userType],
       (err, results) => {
         if (err) {
           console.error("Error during registration:", err);
-          return res
-            .status(500)
-            .json({ error: "Internal Server Error", details: err.message });
+          return res.status(500).json({ error: "Internal Server Error", details: err.message });
         }
 
-        if (results.length > 0) {
-          return res.status(409).json({ error: "Username already exists" });
-        }
-
-        db.query(
-          "INSERT INTO usernew SET ?",
-          {
-            firstName,
-            lastName,
-            userName,
-            password: hash,
-            userType,
-            mobileNo,
-            dob,
-          },
-          (err, results) => {
-            if (err) {
-              console.error("Error during registration:", err);
-              return res
-                .status(500)
-                .json({ error: "Internal Server Error", details: err.message });
-            }
-
-            const userId = results.insertId;
-
-            db.query(
-              "INSERT INTO useraddress (address, userId) VALUES (?, ?)",
-              [address, userId],
-              (err, results) => {
-                if (err) {
-                  console.error("Error during address data insertion:", err);
-                  return res.status(500).json({
-                    error: "Internal Server Error",
-                    details: err.message,
-                  });
-                }
-
-                res.status(201).json({
-                  message: "User and caretaker data registered successfully",
-                });
-              }
-            );
-          }
-        );
+        // Send success response
+        res.status(201).json({ message: "User registered successfully" });
       }
     );
-  });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
-//########################## Controller function to Login user ###########################################################################
+
 
 export const login = (req, res) => {
-  const { userName, password } = req.body;
+  const { email, password } = req.body;
 
-  if (!userName || !password) {
+  if (!email || !password) {
     return res
       .status(400)
-      .json({ error: "Username and password are required" });
+      .json({ error: "email and password are required" });
   }
 
   db.query(
-    "SELECT * FROM usernew WHERE userName = ?",
-    [userName],
+    "SELECT * FROM user WHERE email = ?",
+    [email],
     (err, results) => {
       if (err) {
         console.error("Error during login:", err);
@@ -134,10 +91,8 @@ export const login = (req, res) => {
   );
 };
 
-// ############################################################################################
-
 export const userDetails = (req, res) => {
-  const query = "SELECT * FROM usernew";
+  const query = "SELECT * FROM user";
 
   db.query(query, (err, results) => {
     if (err) {
@@ -148,8 +103,6 @@ export const userDetails = (req, res) => {
     }
   });
 };
-
-//#####################  Controller function to retrieve all caretaker details from the database  ################################################
 
 export const getCaretakerDetails = (req, res) => {
   const query = "SELECT * FROM caretaker";
@@ -166,8 +119,6 @@ export const getCaretakerDetails = (req, res) => {
   });
 };
 
-//########  Controller function to retrieve relevent patient by their caretakerID  ################################################################################
-
 export const getCareTakerById = (req, res) => {
   const userId = req.params.id;
   const query = "SELECT * FROM caretaker WHERE userId = ?";
@@ -183,482 +134,4 @@ export const getCareTakerById = (req, res) => {
     }
   });
 };
-
-export const registerPatient = (req, res) => {
-  console.log("backend data", req.body);
-
-  const {
-    firstName,
-    lastName,
-    nationalId,
-    mobileNo,
-    dob,
-    address,
-    mediCondition,
-    emergCont,
-    category,
-    preffGender,
-    userId,
-  } = req.body;
-
-  // Check if userId is provided in the request body
-  if (!userId) {
-    return res.status(400).json({ error: "userId is required" });
-  }
-
-  db.query(
-    "SELECT * FROM caretakernew WHERE nationalId = ? ",
-    [nationalId],
-    (err, results) => {
-      if (err) {
-        console.error("Error during registration:", err);
-        return res.status(500).json({ error: "Internal Server Error", details: err.message });
-      }
-
-      if (results.length > 0) {
-        const caretakerId = results[0].caretakerId;
-        db.query(
-          "UPDATE caretakernew SET firstName = ?, lastName = ?, dob = ?, mobileNo = ?, emergCont = ?, category = ?, preffGender = ? WHERE caretakerId = ?",
-          [
-            firstName,
-            lastName,
-            dob,
-            mobileNo,
-            emergCont,
-            category,
-            preffGender,
-            caretakerId,
-          ],
-          (err) => {
-            if (err) {
-              console.error("Error during update:", err);
-              return res.status(500).json({ error: "Internal Server Error", details: err.message });
-            }
-
-            db.query(
-              "UPDATE caretakeraddress SET address = ? WHERE caretakerId = ?",
-              [address, caretakerId],
-              (err) => {
-                if (err) {
-                  console.error("Error during address update:", err);
-                  return res.status(500).json({ error: "Internal Server Error", details: err.message });
-                }
-
-                db.query(
-                  "UPDATE caretakermedicondition SET mediCondition = ? WHERE caretakerId = ?",
-                  [mediCondition, caretakerId],
-                  (err) => {
-                    if (err) {
-                      console.error("Error during mediCondition update:", err);
-                      return res.status(500).json({ error: "Internal Server Error", details: err.message });
-                    }
-                    return res.status(200).json({ message: "Data updated successfully" });
-                  }
-                );
-              }
-            );
-          }
-        );
-      } else {
-        db.query(
-          "INSERT INTO caretakernew (firstName, lastName, nationalId, dob, mobileNo, emergCont, category, preffGender, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-          [
-            firstName,
-            lastName,
-            nationalId,
-            dob,
-            mobileNo,
-            emergCont,
-            category,
-            preffGender,
-            userId,
-          ],
-          (err, results) => {
-            if (err) {
-              console.error("Error during registration:", err);
-              return res.status(500).json({ error: "Internal Server Error", details: err.message });
-            }
-
-            const caretakerId = results.insertId;
-
-            db.query(
-              "INSERT INTO caretakeraddress (address, caretakerId) VALUES (?, ?)",
-              [address, caretakerId],
-              (err) => {
-                if (err) {
-                  console.error("Error during address data insertion:", err);
-                  return res.status(500).json({ error: "Internal Server Error", details: err.message });
-                }
-
-                db.query(
-                  "INSERT INTO caretakermedicondition (mediCondition, caretakerId) VALUES (?, ?)",
-                  [mediCondition, caretakerId],
-                  (err) => {
-                    if (err) {
-                      console.error("Error during mediCondition data insertion:", err);
-                      return res.status(500).json({ error: "Internal Server Error", details: err.message });
-                    }
-                    return res.status(201).json({ message: "Caregiver data registered successfully" });
-                  }
-                );
-              }
-            );
-          }
-        );
-      }
-    }
-  );
-};
-
-
-//#########  controller function to register a new patient  #####################################
-// export const registerPatient = (req, res) => {
-//   const {
-//     firstName,
-//     lastName,
-//     dob,
-//     mobileNo,
-//     emergCont,
-//     category,
-//     address,
-//     mediCondition,
-//   } = req.body;
-
-//   db.query(
-//     "SELECT * FROM caretakernew WHERE firstName = ? AND lastName = ?",
-//     [firstName, lastName],
-//     (err, results) => {
-//       if (err) {
-//         console.error("Error during registration:", err);
-//         return res
-//           .status(500)
-//           .json({ error: "Internal Server Error", details: err.message });
-//       }
-
-//       if (results.length > 0) {
-//         return res.status(409).json({ error: "Patient already exists" });
-//       }
-
-//       db.query(
-//         "INSERT INTO caretakernew (firstName, lastName, dob, mobileNo, emergCont, category, userId) VALUES (?, ?, ?, ?, ?, ?, 1)",
-//         [firstName, lastName, dob, mobileNo, emergCont, category],
-//         (err, results) => {
-//           if (err) {
-//             console.error("Error during registration:", err);
-//             return res
-//               .status(500)
-//               .json({ error: "Internal Server Error", details: err.message });
-//           }
-
-//           const caretakerId = results.insertId;
-
-//           db.query(
-//             "INSERT INTO caretakeraddress (address, caretakerId) VALUES (?, ?)",
-//             [address, caretakerId],
-//             (err) => {
-//               if (err) {
-//                 console.error("Error during address data insertion:", err);
-//                 return res.status(500).json({
-//                   error: "Internal Server Error",
-//                   details: err.message,
-//                 });
-//               }
-
-//               db.query(
-//                 "INSERT INTO caretakermedicondition (mediCondition, caretakerId) VALUES (?, ?)",
-//                 [mediCondition, caretakerId],
-//                 (err) => {
-//                   if (err) {
-//                     console.error(
-//                       "Error during mediCondition data insertion:",
-//                       err
-//                     );
-//                     return res.status(500).json({
-//                       error: "Internal Server Error",
-//                       details: err.message,
-//                     });
-//                   }
-
-//                   return res.status(201).json({
-//                     message:
-//                       "User, caretaker address, and medical condition data registered successfully",
-//                   });
-//                 }
-//               );
-//             }
-//           );
-//         }
-//       );
-//     }
-//   );
-// };
-
-// export const registerPatient = (req, res) => {
-
-//   console.log("backend data", req.body);
-
-//   const {
-//     firstName,
-//     lastName,
-//     nationalId,
-//     mobileNo,
-//     dob,
-//     address,
-//     mediCondition,
-//     emergCont,
-//     category,
-//     preffGender,
-
-//   } = req.body;
-
-//   db.query(
-//     "SELECT * FROM caretakernew WHERE nationalId = ? ",
-//     [nationalId],
-//     (err, results) => {
-//       if (err) {
-//         console.error("Error during registration:", err);
-//         return res
-//           .status(500)
-//           .json({ error: "Internal Server Error", details: err.message });
-//       }
-
-//       if (results.length > 0) {
-//         const caretakerId = results[0].caretakerId;
-//         db.query(
-//           "UPDATE caretakernew SET firstName = ?, lastName = ?, dob = ?, mobileNo = ?, emergCont = ?, category = ?, preffGender = ? WHERE caretakerId = ?",
-//           [firstName, lastName, dob, mobileNo, emergCont, category, preffGender, caretakerId],
-//           (err) => {
-//             if (err) {
-//               console.error("Error during update:", err);
-//               return res
-//                 .status(500)
-//                 .json({ error: "Internal Server Error", details: err.message });
-//             }
-
-//             db.query(
-//               "UPDATE caretakeraddress SET address = ? WHERE caretakerId = ?",
-//               [address, caretakerId],
-//               (err) => {
-//                 if (err) {
-//                   console.error("Error during address update:", err);
-//                   return res.status(500).json({
-//                     error: "Internal Server Error",
-//                     details: err.message,
-//                   });
-//                 }
-
-//                 db.query(
-//                   "UPDATE caretakermedicondition SET mediCondition = ? WHERE caretakerId = ?",
-//                   [mediCondition, caretakerId],
-//                   (err) => {
-//                     if (err) {
-//                       console.error("Error during mediCondition update:", err);
-//                       return res.status(500).json({
-//                         error: "Internal Server Error",
-//                         details: err.message,
-//                       });
-//                     }
-
-//                     return res.status(200).json({
-//                       message:
-//                         "User, caretaker address, and medical condition data updated successfully",
-//                     });
-//                   }
-//                 );
-//               }
-//             );
-//           }
-//         );
-//       } else {
-//         db.query(
-//           "INSERT INTO caretakernew (firstName, lastName, dob, mobileNo, emergCont, category, userId) VALUES (?, ?, ?, ?, ?, ?, 1)",
-//           [firstName, lastName, dob, mobileNo, emergCont, category],
-//           (err, results) => {
-//             if (err) {
-//               console.error("Error during registration:", err);
-//               return res
-//                 .status(500)
-//                 .json({ error: "Internal Server Error", details: err.message });
-//             }
-
-//             const caretakerId = results.insertId;
-
-//             db.query(
-//               "INSERT INTO caretakeraddress (address, caretakerId) VALUES (?, ?)",
-//               [address, caretakerId],
-//               (err) => {
-//                 if (err) {
-//                   console.error("Error during address data insertion:", err);
-//                   return res.status(500).json({
-//                     error: "Internal Server Error",
-//                     details: err.message,
-//                   });
-//                 }
-
-//                 db.query(
-//                   "INSERT INTO caretakermedicondition (mediCondition, caretakerId) VALUES (?, ?)",
-//                   [mediCondition, caretakerId],
-//                   (err) => {
-//                     if (err) {
-//                       console.error(
-//                         "Error during mediCondition data insertion:",
-//                         err
-//                       );
-//                       return res.status(500).json({
-//                         error: "Internal Server Error",
-//                         details: err.message,
-//                       });
-//                     }
-
-//                     return res.status(201).json({
-//                       message:
-//                         "User, caretaker address, and medical condition data registered successfully",
-//                     });
-//                   }
-//                 );
-//               }
-//             );
-//           }
-//         );
-//       }
-//     }
-//   );
-// };
-
-//$$$$$$$$$$$$$$ new test register patient function $$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
-//$$$$$$$$$$$$ fist update $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
-// export const registerPatient = (req, res) => {
-
-//   const {
-//     firstName,
-//     lastName,
-//     nationalId,
-//     mobileNo,
-//     dob,
-//     address,
-//     mediCondition,
-//     emergCont,
-//     category,
-//     preffGender,
-
-//   } = req.body;
-
-//   db.query(
-//     "SELECT * FROM caretakernew WHERE nationalId = ? ",
-//     [nationalId],
-//     (err, results) => {
-//       if (err) {
-//         console.error("Error during registration:", err);
-//         return res
-//           .status(500)
-//           .json({ error: "Internal Server Error", details: err.message });
-//       }
-
-//       if (results.length > 0) {
-//         const caretakerId = results[0].caretakerId;
-//         db.query(
-//           "UPDATE caretakernew SET firstName = ?, lastName = ?, dob = ?, mobileNo = ?, emergCont = ?, category = ? WHERE caretakerId = ?",
-//           [firstName, lastName, dob, mobileNo, emergCont, category, caretakerId],
-//           (err) => {
-//             if (err) {
-//               console.error("Error during update:", err);
-//               return res
-//                 .status(500)
-//                 .json({ error: "Internal Server Error", details: err.message });
-//             }
-
-//             db.query(
-//               "UPDATE caretakeraddress SET address = ? WHERE caretakerId = ?",
-//               [address, caretakerId],
-//               (err) => {
-//                 if (err) {
-//                   console.error("Error during address update:", err);
-//                   return res.status(500).json({
-//                     error: "Internal Server Error",
-//                     details: err.message,
-//                   });
-//                 }
-
-//                 db.query(
-//                   "UPDATE caretakermedicondition SET mediCondition = ? WHERE caretakerId = ?",
-//                   [mediCondition, caretakerId],
-//                   (err) => {
-//                     if (err) {
-//                       console.error("Error during mediCondition update:", err);
-//                       return res.status(500).json({
-//                         error: "Internal Server Error",
-//                         details: err.message,
-//                       });
-//                     }
-
-//                     return res.status(200).json({
-//                       message:
-//                         " data updated successfully",
-//                     });
-//                   }
-//                 );
-//               }
-//             );
-//           }
-//         );
-//       } else {
-//         db.query(
-
-//           "INSERT INTO caretakernew (firstName, lastName, nationalId, dob, mobileNo, emergCont, category, preffGender, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)",
-//           [firstName, lastName, nationalId, dob, mobileNo, emergCont, preffGender, category],
-//           (err, results) => {
-//             if (err) {
-//               console.error("Error during registration:", err);
-//               return res
-//                 .status(500)
-//                 .json({ error: "Internal Server Error", details: err.message });
-//             }
-
-//             const caretakerId = results.insertId;
-
-//             db.query(
-//               "INSERT INTO caretakeraddress (address, caretakerId) VALUES (?, ?)",
-//               [address, caretakerId],
-//               (err) => {
-//                 if (err) {
-//                   console.error("Error during address data insertion:", err);
-//                   return res.status(500).json({
-//                     error: "Internal Server Error",
-//                     details: err.message,
-//                   });
-//                 }
-
-//                 db.query(
-//                   "INSERT INTO caretakermedicondition (mediCondition, caretakerId) VALUES (?, ?)",
-//                   [mediCondition, caretakerId],
-//                   (err) => {
-//                     if (err) {
-//                       console.error(
-//                         "Error during mediCondition data insertion:",
-//                         err
-//                       );
-//                       return res.status(500).json({
-//                         error: "Internal Server Error",
-//                         details: err.message,
-//                       });
-//                     }
-
-//                     return res.status(201).json({
-//                       message:
-//                         "User, caretaker address, and medical condition data registered successfully",
-//                     });
-//                   }
-//                 );
-//               }
-//             );
-//           }
-//         );
-//       }
-//     }
-//   );
-// };
-
-// second update
 
