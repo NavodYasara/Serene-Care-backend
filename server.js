@@ -3,6 +3,7 @@ import cors from 'cors';
 import requirementRoutes from './routes/requirementRoutes.js';
 import managerRoutes from './routes/managerRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import db from "./db/db.js";
 
 // Create an Express application as middleware
 const app = express();
