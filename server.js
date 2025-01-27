@@ -4,6 +4,7 @@ import requirementRoutes from './routes/requirementRoutes.js';
 import managerRoutes from './routes/managerRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import db from "./db/db.js";
+import bodyParser from 'body-parser';
 
 // Create an Express application as middleware
 const app = express();
@@ -13,26 +14,6 @@ app.use(cors());
 
 // Enable parsing JSON request bodies using the middleware
 app.use(express.json());
-
-//////////// Create a MySQL connection //////////////////////////////////////////////////////////////////////////////
-// export const db = mysql.createConnection({
-//   host: 'localhost',
-//   user: 'root',
-//   password: 'admin',
-//   database: 'serene_care_solution'
-// });
-
-// db.connect((err) => {
-//   if (err) {
-//     console.error('Error connecting to MySQL:', err);
-//     return;
-//   }
-//   console.log('Connected to MySQL database');
-// });
-
-//################### Define Routes ####################################################################
-
-
 app.use('/api/user', userRoutes);
 app.use('/api/requirement', requirementRoutes);
 app.use('/api/manager', managerRoutes);
