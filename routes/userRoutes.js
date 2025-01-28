@@ -4,7 +4,7 @@ import {
     userRegister,
     // userDetails,
     // getCaretakerDetails,
-    } from '../Controller/userController.js';
+    } from '../controller/userController.js';
 
 
 const router = express.Router();

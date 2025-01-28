@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { insertRequirement, insertRequest,getAllRequirements } from '../Controller/requirementController.js';
+import { insertRequirement, insertRequest,getAllRequirements } from '../controller/requirementController.js';
 
 const router = express.Router();
 

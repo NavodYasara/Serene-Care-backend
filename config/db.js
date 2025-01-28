@@ -11,15 +11,6 @@ const db = mysql.createConnection({
     database: 'serene_care_solution'
 }).promise();
 
-// Connect to MySQL
-// db.connect((err) => {
-//     if (err) {
-//         console.error('Error connecting to MySQL:', err);
-//         return;
-//     }
-//     console.log('Connected to MySQL database');
-// });
-
 // export default db;
 
 dotenv.config();
@@ -33,3 +24,12 @@ const pool = new Pool({
 });
 
 export default pool;
+
+// Connect to MySQL
+// db.connect((err) => {
+//     if (err) {
+//         console.error('Error connecting to MySQL:', err);
+//         return;
+//     }
+//     console.log('Connected to MySQL database');
+// });

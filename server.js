@@ -5,6 +5,10 @@ import managerRoutes from './routes/managerRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import db from "./db/db.js";
 import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config(); 
 
 // Create an Express application as middleware
 const app = express();

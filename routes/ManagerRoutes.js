@@ -1,5 +1,5 @@
 import express from 'express';
-import { getCaretakers, getCaretakerInformation, getCaregivers } from '../Controller/managerController.js';
+import { getCaretakers, getCaretakerInformation, getCaregivers } from '../controller/managerController.js';
 
 const router = express.Router();
 
