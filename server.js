@@ -3,7 +3,7 @@ import cors from 'cors';
 import requirementRoutes from './routes/requirementRoutes.js';
 import managerRoutes from './routes/managerRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-import db from "./db/db.js";
+import db from "./config/db.js";
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 

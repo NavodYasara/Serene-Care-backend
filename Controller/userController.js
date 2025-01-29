@@ -63,22 +63,19 @@ import db from "../db/db.js";
 export const userRegister = async (req, res) => {
   console.log(req.body); // Log the request body for debugging
 
-  const { firstName, lastName, email, password, confpassword, mobileNo, userType } = req.body;
+  const { firstName, lastName, email, password, mobileNo, role } = req.body;
 
-  if (!firstName || !lastName || !email || !password || !confpassword || !mobileNo || !userType) {
+  if (!firstName || !lastName || !email || !password || !mobileNo || !role) {
     return res.status(400).json({ error: "All fields are required" });
   }
 
   // Hash the password
-  const hashedPassword = await bcrypt.hash(password, 10);
+  //const hashedPassword = await bcrypt.hash(password, 10);
 
   // Insert the user into the database
-  const query =
-    "INSERT INTO user (firstName, lastName, email, password, userType, mobileNo) VALUES (?, ?, ?, ?, ?, ?)";
-  db.query(
-    query,
-    [firstName, lastName, email, hashedPassword, userType, mobileNo],
-    (err, results) => {
+  const query = "INSERT INTO user (firstName, lastName, email, password, mobileNo, role) VALUES (?, ?, ?, ?, ?, ?)";
+  
+  db.query(query,[firstName, lastName, password, email, mobileNo, role],(err, results) => {
       if (err) {
         console.error(err.message);
         res
@@ -103,7 +100,7 @@ export const login = (req, res) => {
       console.error("Error during login:", err);
       return res
         .status(500)
-        .json({ error: "Internal Server Error", details: err.message });n jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjmmmmmmk\\\\\\\\\kjj
+        .json({ error: "Internal Server Error", details: err.message });
     }
 
     if (results.length === 0) {

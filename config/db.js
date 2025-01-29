@@ -1,7 +1,7 @@
 import mysql from 'mysql2'
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
-const mysql = require('mysq2');
+
 
 // Database connection configuration
 const db = mysql.createConnection({
