@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js';
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 dotenv.config(); // Load environment variables from .env file
 const app = express(); // Create an Express application as middleware
