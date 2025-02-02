@@ -7,7 +7,7 @@ import { promise } from 'bcrypt/promises.js';
 export default registerService = () => {
     return new promise((resolve,reject) => {
         const userRegister = `INSERT INTO users (firstName,lastName,userName,email,password,role) values (?,?,?,?,?,?)`;
-        db.query(userRegister, [userName,email,password], (err, result) => {
+        db.query(userRegister, [firstName,lastName,userName,email,password,role], (err, result) => {
             if(err) {
                 reject(err);
             }
