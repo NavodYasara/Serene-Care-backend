@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import db from "../db/db.js";
+import db from "../config/db.js";
 
 // export const userRegister = async (req, res) => {
 //   const {
@@ -83,7 +83,7 @@ export const userRegister = async (req, res) => {
           .json({ error: "Internal Server Error", details: err.message });
       } else {
         res.status(201).json({ message: "User registered successfully" });
-      }
+      } 
     }
   );
 };

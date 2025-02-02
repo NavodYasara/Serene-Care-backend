@@ -1,35 +1,27 @@
-import mysql from 'mysql2'
-import { Pool } from 'pg';
+
+import mysql from 'mysql2';
 import dotenv from 'dotenv';
 
+dotenv.config(); // Load environment variables
 
-// Database connection configuration
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'admin',
-    database: 'serene_care_solution'
-}).promise();
-
-// export default db;
-
-dotenv.config();
-
-const pool = new Pool({
-    user: process.env.DB_USER,
+const pool = mysql.createPool({
     host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    password: process.env.DB_PASS,
     port: process.env.DB_PORT,
+    waitForConnections: true,
+    connectionLimit: 10, // Set a limit to avoid overloading
+    queueLimit: 0
+});
+
+pool.getConnection((err, connection) => {
+    if (err) {
+        console.error("❌ MySQL Connection Failed:", err);
+    } else {
+        console.log("✅ MySQL Connected Successfully!");
+        connection.release(); // Release the connection back to the pool
+    }
 });
 
 export default pool;
-
-// Connect to MySQL
-// db.connect((err) => {
-//     if (err) {
-//         console.error('Error connecting to MySQL:', err);
-//         return;
-//     }
-//     console.log('Connected to MySQL database');
-// });
