@@ -24,10 +24,10 @@ export const registerController = async (req, res) => {
 
 // Login a user
 export const loginController = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;
 
   try {
-    const data = await loginService(email, password);
+    const data = await loginService(email, password, role);
     return res.status(200).json({ message: "User logged in successfully", user: data });
   } catch (error) {
       res.status(500).json({ error: "Internal Server Error", details: error.message });

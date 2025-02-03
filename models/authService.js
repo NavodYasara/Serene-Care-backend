@@ -13,16 +13,21 @@ export const registerService = (firstName, lastName, email, password, role) => {
 };
 
 
-export const loginService = (email, password) => {
+export const loginService = (email, password, role) => {
     return new Promise((resolve,reject) => {
-        const userLoginData = `SELECT * FROM user WHERE email = ? AND password = ?`;
-        db.query(userLoginData, [email, password], (err, result)=> {
-            if (result.length > 0) {
+        const userLoginData = `SELECT userId, email, password, role FROM user WHERE email = ? AND password = ? AND role = ?`;
+        db.query(userLoginData, [email, password, role], (err, result)=> {
+            if (err) {
+                reject(err);
+            } else if (result.length > 0) {
                 resolve(result[0]);
-            }
-            else {
-                reject("User not found");
+            } else {
+                reject("Invalid email or password");
             }
         });
     });
 };
+
+
+
+
