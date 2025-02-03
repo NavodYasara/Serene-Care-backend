@@ -1,0 +1,15 @@
+{"roles": [{
+    "name": "admin",
+    "permissions": ["*"]
+}, {
+    "name": "caretaker",
+    "permissions": [
+        "create_record",
+        "read_record",
+        "update_record",
+        "delete_record"]
+}, {
+    "name": "caregiver",
+    "permissions": ["read_record"]
+}]
+}
