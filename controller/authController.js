@@ -1,4 +1,4 @@
-import registerService from "../models/authService.js";
+import {registerService, loginService} from "../models/authService.js";
 
 // Register a new user
 export const registerController = async (req, res) => {
@@ -21,3 +21,16 @@ export const registerController = async (req, res) => {
       .json({ error: "Internal Server Error", details: error.message });
   }
 };
+
+// Login a user
+export const loginController = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const data = await loginService(email, password);
+    return res.status(200).json({ message: "User logged in successfully", user: data });
+  } catch (error) {
+      res.status(500).json({ error: "Internal Server Error", details: error.message });
+  }
+};
+
