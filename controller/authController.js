@@ -1,4 +1,4 @@
-import {registerService, loginService} from "../models/authService.js";
+import {registerService, loginService} from "../models/authModel.js";
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
