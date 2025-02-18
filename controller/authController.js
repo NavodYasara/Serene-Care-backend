@@ -1,6 +1,9 @@
-import {registerService, loginService} from "../models/authModel.js";
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
+// controller/authController.js
+
+import { registerService, loginService } from "../models/authModel.js";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import { generateToken } from "../utils/jwt.js";
 
 // Register a new user
 export const registerController = async (req, res) => {
@@ -22,8 +25,6 @@ export const registerController = async (req, res) => {
       .status(500)
       .json({ error: "Internal Server Error", details: error.message });
   }
-
-
 };
 
 // Login a user
@@ -32,9 +33,13 @@ export const loginController = async (req, res) => {
 
   try {
     const loginData = await loginService(email, password);
-    return res.status(200).json({ message: "User logged in successfully", user: loginData });
+    const token = generateToken(loginData);
+    return res
+      .status(200)
+      .json({ message: "User logged in successfully", user: loginData, token });
   } catch (error) {
-      res.status(500).json({ Error: error });
+    res.status(500).json({ Error: error });
   }
 };
+
 
