@@ -80,6 +80,101 @@ export const registerCaretaker = (req, res) => {
   });
 };
 
+export const registerCaregiver = (req, res) => {
+  const { firstName, lastName, userName, password, mobileNo, dob, address, specialization } =
+    req.body;
+  const userType = "caregiver";
+
+  if (!userName || !password) {
+    return res
+      .status(400)
+      .json({ error: "User Name and password are required" });
+  }
+
+  bcrypt.hash(password, 10, (err, hash) => {
+    if (err) {
+      console.error("Error during registration:", err);
+      return res
+        .status(500)
+        .json({ error: "Internal Server Error", details: err.message });
+    }
+
+    db.query(
+      "SELECT * FROM usernew WHERE userName = ? AND userType = ?",
+      [userName, userType],
+      (err, results) => {
+        if (err) {
+          console.error("Error during registration:", err);
+          return res
+            .status(500)
+            .json({ error: "Internal Server Error", details: err.message });
+        }
+
+        if (results.length > 0) {
+          return res.status(409).json({ error: "Username already exists" });
+        }
+
+        db.query(
+          "INSERT INTO usernew SET ?",
+          {
+            firstName,
+            lastName,
+            userName,
+            password: hash,
+            userType,
+            mobileNo,
+            dob,
+          },
+          (err, results) => {
+            if (err) {
+              console.error("Error during registration:", err);
+              return res
+                .status(500)
+                .json({ error: "Internal Server Error", details: err.message });
+            }
+
+            const userId = results.insertId;
+
+            // Insert into caregiver table
+            db.query(
+              "INSERT INTO caregiver (userId, specialization, availability) VALUES (?, ?, 'AVAILABLE')",
+              [userId, specialization || "General"],
+              (err, results) => {
+                if (err) {
+                  console.error("Error during caregiver data insertion:", err);
+                  return res.status(500).json({
+                    error: "Internal Server Error",
+                    details: err.message,
+                  });
+                }
+
+                // Insert into useraddress
+                db.query(
+                  "INSERT INTO useraddress (address, userId) VALUES (?, ?)",
+                  [address, userId],
+                  (err, results) => {
+                    if (err) {
+                      console.error("Error during address data insertion:", err);
+                      return res.status(500).json({
+                        error: "Internal Server Error",
+                        details: err.message,
+                      });
+                    }
+
+                    res.status(201).json({
+                      message: "Caregiver registered successfully",
+                    });
+                  }
+                );
+              }
+            );
+          }
+        );
+      }
+    );
+  });
+};
+
 //########################## Controller function to Login user ###########################################################################
 
 export const login = (req, res) => {

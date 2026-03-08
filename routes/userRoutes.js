@@ -3,6 +3,7 @@ import {
     login,
     logout,
     registerCaretaker,
+    registerCaregiver,
     userDetails,
     getCaretakerDetails,
     registerCaretakerProfile,
@@ -13,6 +14,7 @@ import {
 const router = express.Router();
 
 router.post('/registerCaretaker', registerCaretaker);
+router.post('/registerCaregiver', registerCaregiver);
 router.post('/registerCaretakerProfile', registerCaretakerProfile);
 router.put('/updateCaretakerProfile', updateCaretakerProfile);
 router.post('/login',login); // Define the route for the login controller
