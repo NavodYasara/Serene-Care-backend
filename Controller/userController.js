@@ -1,10 +1,9 @@
 import bcrypt from "bcrypt";
 import { db } from "../server.js";
 
-export const registerCaretaker = (req, res) => {
-  const { firstName, lastName, userName, password, mobileNo, dob, address } =
-    req.body;
-  const userType = "caretaker";
+export const registerCaretaker = async (req, res) => {
+  const { userName, password } = req.body;
+  const USER_TYPE = "caretaker";
 
   if (!userName || !password) {
     return res
@@ -12,72 +11,36 @@ export const registerCaretaker = (req, res) => {
       .json({ error: "User Name and password are required" });
   }
 
-  bcrypt.hash(password, 10, (err, hash) => {
-    if (err) {
-      console.error("Error during registration:", err);
-      return res
-        .status(500)
-        .json({ error: "Internal Server Error", details: err.message });
+  try {
+    const [existing] = await db
+      .promise()
+      .query("SELECT * FROM user WHERE userName = ? AND userType = ?", [
+        userName,
+        USER_TYPE,
+      ]);
+
+    if (existing.length > 0) {
+      return res.status(409).json({ error: "User already exists" });
     }
 
-    db.query(
-      "SELECT * FROM user WHERE userName = ? AND userType = ?",
-      [userName, userType],
-      (err, results) => {
-        if (err) {
-          console.error("Error during registration:", err);
-          return res
-            .status(500)
-            .json({ error: "Internal Server Error", details: err.message });
-        }
+    const hash = await bcrypt.hash(password, 10);
 
-        if (results.length > 0) {
-          return res.status(409).json({ error: "Username already exists" });
-        }
+    const [result] = await db.promise().query("INSERT INTO user SET ?", {
+      userName,
+      password: hash,
+      userType: USER_TYPE,
+    });
 
-        db.query(
-          "INSERT INTO user SET ?",
-          {
-            firstName,
-            lastName,
-            userName,
-            password: hash,
-            userType,
-            mobileNo,
-            dob,
-          },
-          (err, results) => {
-            if (err) {
-              console.error("Error during registration:", err);
-              return res
-                .status(500)
-                .json({ error: "Internal Server Error", details: err.message });
-            }
-
-            const userId = results.insertId;
-
-            db.query(
-              "INSERT INTO useraddress (address, userId) VALUES (?, ?)",
-              [address, userId],
-              (err, results) => {
-                if (err) {
-                  console.error("Error during address data insertion:", err);
-                  return res.status(500).json({
-                    error: "Internal Server Error",
-                    details: err.message,
-                  });
-                }
-
-                res.status(201).json({
-                  message: "User and caretaker data registered successfully",
-                });
-              },
-            );
-          },
-        );
-      },
-    );
-  });
+    return res.status(201).json({
+      message: "Caretaker registered successfully",
+      userId: result.insertId,
+    });
+  } catch (err) {
+    console.error("Error during registration:", err);
+    return res
+      .status(500)
+      .json({ error: "Internal Server Error", details: err.message });
+  }
 };
 
 export const registerAdmin = async (req, res) => {
@@ -91,12 +54,15 @@ export const registerAdmin = async (req, res) => {
   }
 
   try {
-    const [existing] = await db.promise().query("SELECT * FROM user WHERE userName = ?", [
-      userName,
-    ]);
+    const [existing] = await db
+      .promise()
+      .query("SELECT * FROM user WHERE userName = ? AND userType = ?", [
+        userName,
+        USER_TYPE,
+      ]);
 
     if (existing.length > 0) {
-      return res.status(409).json({ error: "Username already exists" });
+      return res.status(409).json({ error: "User already exists" });
     }
 
     const hash = await bcrypt.hash(password, 10);
@@ -225,8 +191,6 @@ export const registerCaregiver = (req, res) => {
   });
 };
 
-//########################## Controller function to Login user ###########################################################################
-
 export const login = (req, res) => {
   const { userName, password } = req.body;
 
@@ -279,8 +243,6 @@ export const login = (req, res) => {
   );
 };
 
-// ############################################################################################
-
 export const userDetails = (req, res) => {
   const query = "SELECT * FROM user";
 
@@ -293,8 +255,6 @@ export const userDetails = (req, res) => {
     }
   });
 };
-
-//#####################  Controller function to retrieve all caretaker details from the database  ################################################
 
 export const getCaretakerDetails = (req, res) => {
   const query = "SELECT * FROM caretaker";
@@ -310,8 +270,6 @@ export const getCaretakerDetails = (req, res) => {
     }
   });
 };
-
-//########  Controller function to retrieve relevant caretaker by their caretakerID  ################################################################################
 
 export const getCareTakerById = (req, res) => {
   const userId = req.params.id;
@@ -329,23 +287,10 @@ export const getCareTakerById = (req, res) => {
   });
 };
 
-//########################################################################################
-
 export const registerCaretakerProfile = (req, res) => {
   console.log("backend data", req.body);
 
-  const {
-    firstName,
-    lastName,
-    nationalId,
-    mobileNo,
-    dob,
-    address,
-    mediCondition,
-    emergCont,
-    category,
-    userId,
-  } = req.body;
+  const { firstName, lastName, password, userType } = req.body;
 
   // Check if userId is provided in the request body
   if (!userId) {
@@ -353,7 +298,7 @@ export const registerCaretakerProfile = (req, res) => {
   }
 
   db.query(
-    "SELECT * FROM caretakernew WHERE nationalId = ? ",
+    "SELECT * FROM caretaker WHERE nationalId = ? ",
     [nationalId],
     (err, results) => {
       if (err) {
@@ -366,7 +311,7 @@ export const registerCaretakerProfile = (req, res) => {
       if (results.length > 0) {
         const caretakerId = results[0].caretakerId;
         db.query(
-          "UPDATE caretakernew SET firstName = ?, lastName = ?, dob = ?, mobileNo = ?, emergCont = ?, category = ? WHERE caretakerId = ?",
+          "UPDATE caretaker SET firstName = ?, lastName = ?, dob = ?, mobileNo = ?, emergCont = ?, category = ? WHERE caretakerId = ?",
           [
             firstName,
             lastName,
@@ -418,7 +363,7 @@ export const registerCaretakerProfile = (req, res) => {
         );
       } else {
         db.query(
-          "INSERT INTO caretakernew (firstName, lastName, nationalId, dob, mobileNo, emergCont, category, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+          "INSERT INTO caretaker (firstName, lastName, nationalId, dob, mobileNo, emergCont, category, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
           [
             firstName,
             lastName,
@@ -499,7 +444,7 @@ export const updateCaretakerProfile = (req, res) => {
 
   // Find caretakerId first
   db.query(
-    "SELECT caretakerId FROM caretakernew WHERE userId = ?",
+    "SELECT caretakerId FROM caretaker WHERE userId = ?",
     [userId],
     (err, results) => {
       if (err) {
@@ -518,7 +463,7 @@ export const updateCaretakerProfile = (req, res) => {
       const caretakerId = results[0].caretakerId;
 
       db.query(
-        "UPDATE caretakernew SET firstName = ?, lastName = ?, nationalId = ?, dob = ?, mobileNo = ?, emergCont = ?, category = ? WHERE caretakerId = ?",
+        "UPDATE caretaker SET firstName = ?, lastName = ?, nationalId = ?, dob = ?, mobileNo = ?, emergCont = ?, category = ? WHERE caretakerId = ?",
         [
           firstName,
           lastName,
@@ -584,7 +529,7 @@ export const getCaretakerData = (req, res) => {
       ct.*, 
       cta.address, 
       ctm.mediCondition 
-    FROM caretakernew ct
+    FROM caretaker ct
     LEFT JOIN caretakeraddress cta ON ct.caretakerId = cta.caretakerId
     LEFT JOIN caretakermedicondition ctm ON ct.caretakerId = ctm.caretakerId
     WHERE ct.userId = ?

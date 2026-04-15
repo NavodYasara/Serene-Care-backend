@@ -59,7 +59,7 @@ app.get("/server/usernew", (req, res) => {
 
 // Define a route to retrieve all caretaker details
 app.get("/server/caretakerDetails", (req, res) => {
-  const sql = "SELECT * FROM caretakernew";
+  const sql = "SELECT * FROM caretaker";
   db.query(sql, (err, results) => {
     if (err) {
       console.error("Error retrieving caretaker details:", err.message);

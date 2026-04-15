@@ -6,7 +6,7 @@ export const getCaretakerInformation = async (req, res) => {
     const query = `
       SELECT *
       FROM requirement r
-      LEFT JOIN caretakernew ct 
+      LEFT JOIN caretaker ct 
       ON r.caretakerId = ct.caretakerId
       LEFT JOIN caretakermedicondition ctm
       ON ct.caretakerId = ctm.caretakerId
@@ -40,7 +40,7 @@ export const getCaretakerById = async (req, res) => {
         DATE_FORMAT(ct.dob, '%Y-%m-%d') AS formattedDob,
         ct.firstName,
         ct.lastName
-        FROM caretakernew ct
+        FROM caretaker ct
         LEFT JOIN requirement r ON ct.caretakerId = r.caretakerId 
         LEFT JOIN caretakeraddress cta ON ct.caretakerId = cta.caretakerId
         LEFT JOIN caretakermedicondition ctm ON ct.caretakerId = ctm.caretakerId
@@ -116,7 +116,7 @@ export const allocateCaregiver = async (req, res) => {
     console.log(caregiverId);
 
     // Fetch the category for the given caretakerId
-    const categoryQuery = `SELECT category FROM caretakernew WHERE caretakerId = ?`;
+    const categoryQuery = `SELECT category FROM caretaker WHERE caretakerId = ?`;
     db.query(categoryQuery, [caretakerId], (err, results) => {
       if (err) {
         console.error(err.message);

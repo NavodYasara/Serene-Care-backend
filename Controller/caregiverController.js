@@ -5,7 +5,7 @@ export const getrequestedcaretakers = (req, res) => {
     db.query(
       `SELECT r.requirementId, r.requirement, r.startDate, r.endDate, r.status, r.caretakerId, r.preffGender, r.userId, un.userId, ct.category, cp.caretakerId, cp.caregiverId
       FROM requirement r
-      JOIN caretakernew ct ON r.caretakerId = ct.caretakerId
+      JOIN caretaker ct ON r.caretakerId = ct.caretakerId
       JOIN careplan cp ON r.requirementId = cp.requirementId
       JOIN user un ON r.userId = un.userId
       WHERE r.status = 'Pending'`,
@@ -82,12 +82,12 @@ export const assignedcaretakers = (req, res) => {
         caregiver = results[0].caregiverId;
 
         db.query(
-          `SELECT requirement.*, careplan.*, caretakernew.*, caretakeraddress.address, caretakermedicondition.mediCondition
+          `SELECT requirement.*, careplan.*, caretaker.*, caretakeraddress.address, caretakermedicondition.mediCondition
       FROM requirement
       LEFT JOIN careplan ON careplan.requirementId = requirement.requirementId
-      LEFT JOIN caretakernew ON requirement.caretakerId = caretakernew.caretakerId
-      LEFT JOIN caretakeraddress ON caretakernew.caretakerId = caretakeraddress.caretakerId
-      LEFT JOIN caretakermedicondition ON caretakermedicondition.caretakerId = caretakernew.caretakerId
+      LEFT JOIN caretaker ON requirement.caretakerId = caretaker.caretakerId
+      LEFT JOIN caretakeraddress ON caretaker.caretakerId = caretakeraddress.caretakerId
+      LEFT JOIN caretakermedicondition ON caretakermedicondition.caretakerId = caretaker.caretakerId
       WHERE careplan.caregiverId = ?`,
           [caregiver],
           (err, results) => {
@@ -109,12 +109,12 @@ export const assignedcaretakers = (req, res) => {
 
   // try {
   //   db.query(
-  //     `SELECT requirement.*, careplan.*, caretakernew.*, caretakeraddress.address, caretakermedicondition.mediCondition
+  //     `SELECT requirement.*, careplan.*, caretaker.*, caretakeraddress.address, caretakermedicondition.mediCondition
   //     FROM requirement
   //     LEFT JOIN careplan ON careplan.requirementId = requirement.requirementId
-  //     LEFT JOIN caretakernew ON requirement.caretakerId = caretakernew.caretakerId
-  //     LEFT JOIN caretakeraddress ON caretakernew.caretakerId = caretakeraddress.caretakerId
-  //     LEFT JOIN caretakermedicondition ON caretakermedicondition.caretakerId = caretakernew.caretakerId
+  //     LEFT JOIN caretaker ON requirement.caretakerId = caretaker.caretakerId
+  //     LEFT JOIN caretakeraddress ON caretaker.caretakerId = caretakeraddress.caretakerId
+  //     LEFT JOIN caretakermedicondition ON caretakermedicondition.caretakerId = caretaker.caretakerId
   //     WHERE careplan.caregiverId = ?`,
   //     [caregiver],
   //     (err, results) => {
@@ -178,7 +178,7 @@ export const getAllRequirements = (req, res) => {
     ctm.mediCondition
     FROM
     requirement r
-    JOIN caretakernew ct ON r.caretakerId = ct.caretakerId
+    JOIN caretaker ct ON r.caretakerId = ct.caretakerId
     JOIN caretakeraddress cta ON ct.caretakerId = cta.caretakerId
     JOIN caretakermedicondition ctm ON ct.caretakerId = ctm.caretakerId;`,
     (err, results) => {
