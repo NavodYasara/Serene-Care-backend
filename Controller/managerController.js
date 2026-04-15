@@ -1,6 +1,5 @@
 import { db } from "../server.js";
 
-
 // Get detailed caretaker information from both ct & ctAddress & ctMediCondition tables
 export const getCaretakerInformation = async (req, res) => {
   try {
@@ -23,16 +22,15 @@ export const getCaretakerInformation = async (req, res) => {
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: error.message });    
+    res.status(500).json({ error: error.message });
   }
 };
 
 // Get caretaker details by ID
 export const getCaretakerById = async (req, res) => {
   try {
-
     const caretakerId = req.params.caretakerId;
-    
+
     const query = `
       SELECT 
           ct.*, 
@@ -65,10 +63,10 @@ export const getCaretakerById = async (req, res) => {
   }
 };
 
-// Get caregivers from usernew and caregiver tables to the caregier information section
+// Get caregivers from user and caregiver tables to the caregier information section
 export const getCaregivers = async (req, res) => {
-   try {
-    const query = `SELECT * FROM usernew u JOIN caregiver cg ON u.userId = cg.userId WHERE u.userType = 'Caregiver' AND cg.availability = 'AVAILABLE'`;
+  try {
+    const query = `SELECT * FROM user u JOIN caregiver cg ON u.userId = cg.userId WHERE u.userType = 'Caregiver' AND cg.availability = 'AVAILABLE'`;
     db.query(query, (err, results) => {
       if (err) {
         console.error(err.message);
@@ -89,7 +87,7 @@ export const getCaregiverById = async (req, res) => {
   try {
     const query = `
       SELECT *
-      FROM usernew u
+      FROM user u
       JOIN caregiver cg ON u.userId = cg.userId
       JOIN caregiveraddress cga ON cg.caregiverId = cga.caregiverId
       WHERE cg.caregiverId = ?
@@ -100,7 +98,7 @@ export const getCaregiverById = async (req, res) => {
         console.error(err.message);
         res.status(500).json({ error: err.message });
       } else if (results.length === 0) {
-        res.status(404).json({ error: 'Caregiver not found' });
+        res.status(404).json({ error: "Caregiver not found" });
       } else {
         res.json(results[0]);
       }
@@ -111,11 +109,11 @@ export const getCaregiverById = async (req, res) => {
   }
 };
 
-
 export const allocateCaregiver = async (req, res) => {
   try {
-    const { caretakerId, caregiverId, requirementId, status, instruction } = req.body;
-    console.log(caregiverId)
+    const { caretakerId, caregiverId, requirementId, status, instruction } =
+      req.body;
+    console.log(caregiverId);
 
     // Fetch the category for the given caretakerId
     const categoryQuery = `SELECT category FROM caretakernew WHERE caretakerId = ?`;
@@ -144,7 +142,7 @@ export const allocateCaregiver = async (req, res) => {
             UPDATE careplan
             SET caretakerId = ?, caregiverId = ?, status = 'not assigned', instruction = ?, category = ?
             WHERE requirementId = ?
-          ` 
+          `
           : `
             INSERT INTO careplan (caretakerId, caregiverId, requirementId, status, instruction, category)
             VALUES (?, ?, ?, 'not assigned', ?, ?)
@@ -152,16 +150,20 @@ export const allocateCaregiver = async (req, res) => {
 
         db.query(
           query,
-          isUpdate?[caretakerId, caregiverId,  instruction, category,requirementId]:[caretakerId, caregiverId, requirementId, instruction, category],
+          isUpdate
+            ? [caretakerId, caregiverId, instruction, category, requirementId]
+            : [caretakerId, caregiverId, requirementId, instruction, category],
           (err, results) => {
             if (err) {
               console.error(err.message);
               res.status(500).json({ error: err.message });
             } else {
-              const message = isUpdate ? "Careplan updated successfully!" : "Caregiver allocated successfully!";
+              const message = isUpdate
+                ? "Careplan updated successfully!"
+                : "Caregiver allocated successfully!";
               res.json({ message });
             }
-          }
+          },
         );
       });
     });
@@ -173,7 +175,7 @@ export const allocateCaregiver = async (req, res) => {
 
 export const handleinstruction = async (req, res) => {
   try {
-    const { instruction, requirementId } = req.body
+    const { instruction, requirementId } = req.body;
     const query = `update careplan set instruction = ? where requirementId = ?`;
     db.query(query, [instruction, requirementId], (err, results) => {
       if (err) {
@@ -183,14 +185,8 @@ export const handleinstruction = async (req, res) => {
         res.json({ message: "Instruction updated successfully!" });
       }
     });
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: error.message });
   }
 };
-
-
-
-
-

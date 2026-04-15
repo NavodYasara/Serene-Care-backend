@@ -21,7 +21,7 @@ export const registerCaretaker = (req, res) => {
     }
 
     db.query(
-      "SELECT * FROM usernew WHERE userName = ? AND userType = ?",
+      "SELECT * FROM user WHERE userName = ? AND userType = ?",
       [userName, userType],
       (err, results) => {
         if (err) {
@@ -36,7 +36,7 @@ export const registerCaretaker = (req, res) => {
         }
 
         db.query(
-          "INSERT INTO usernew SET ?",
+          "INSERT INTO user SET ?",
           {
             firstName,
             lastName,
@@ -71,18 +71,65 @@ export const registerCaretaker = (req, res) => {
                 res.status(201).json({
                   message: "User and caretaker data registered successfully",
                 });
-              }
+              },
             );
-          }
+          },
         );
-      }
+      },
     );
   });
 };
 
+export const registerAdmin = async (req, res) => {
+  const { firstName, lastName, userName, password } = req.body;
+  const USER_TYPE = "admin";
+
+  if (!userName || !password) {
+    return res
+      .status(400)
+      .json({ error: "User Name and password are required" });
+  }
+
+  try {
+    const [existing] = await db.promise().query("SELECT * FROM user WHERE userName = ?", [
+      userName,
+    ]);
+
+    if (existing.length > 0) {
+      return res.status(409).json({ error: "Username already exists" });
+    }
+
+    const hash = await bcrypt.hash(password, 10);
+
+    const [result] = await db.promise().query("INSERT INTO user SET ?", {
+      firstName,
+      lastName,
+      userName,
+      password: hash,
+      userType: USER_TYPE,
+    });
+
+    return res.status(201).json({
+      message: "Admin registered successfully",
+      userId: result.insertId, // now actually used
+    });
+  } catch (err) {
+    console.error("Error during registration:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 export const registerCaregiver = (req, res) => {
-  const { firstName, lastName, userName, password, mobileNo, dob, address, specialization } =
-    req.body;
+  const {
+    firstName,
+    lastName,
+    userName,
+    password,
+    mobileNo,
+    dob,
+    address,
+    specialization,
+  } = req.body;
   const userType = "caregiver";
 
   if (!userName || !password) {
@@ -100,7 +147,7 @@ export const registerCaregiver = (req, res) => {
     }
 
     db.query(
-      "SELECT * FROM usernew WHERE userName = ? AND userType = ?",
+      "SELECT * FROM user WHERE userName = ? AND userType = ?",
       [userName, userType],
       (err, results) => {
         if (err) {
@@ -115,7 +162,7 @@ export const registerCaregiver = (req, res) => {
         }
 
         db.query(
-          "INSERT INTO usernew SET ?",
+          "INSERT INTO user SET ?",
           {
             firstName,
             lastName,
@@ -154,7 +201,10 @@ export const registerCaregiver = (req, res) => {
                   [address, userId],
                   (err, results) => {
                     if (err) {
-                      console.error("Error during address data insertion:", err);
+                      console.error(
+                        "Error during address data insertion:",
+                        err,
+                      );
                       return res.status(500).json({
                         error: "Internal Server Error",
                         details: err.message,
@@ -164,13 +214,13 @@ export const registerCaregiver = (req, res) => {
                     res.status(201).json({
                       message: "Caregiver registered successfully",
                     });
-                  }
+                  },
                 );
-              }
+              },
             );
-          }
+          },
         );
-      }
+      },
     );
   });
 };
@@ -187,7 +237,7 @@ export const login = (req, res) => {
   }
 
   db.query(
-    "SELECT * FROM usernew WHERE userName = ?",
+    "SELECT * FROM user WHERE userName = ?",
     [userName],
     (err, results) => {
       if (err) {
@@ -225,14 +275,14 @@ export const login = (req, res) => {
           userDetails: results[0],
         });
       });
-    }
+    },
   );
 };
 
 // ############################################################################################
 
 export const userDetails = (req, res) => {
-  const query = "SELECT * FROM usernew";
+  const query = "SELECT * FROM user";
 
   db.query(query, (err, results) => {
     if (err) {
@@ -308,7 +358,9 @@ export const registerCaretakerProfile = (req, res) => {
     (err, results) => {
       if (err) {
         console.error("Error during registration:", err);
-        return res.status(500).json({ error: "Internal Server Error", details: err.message });
+        return res
+          .status(500)
+          .json({ error: "Internal Server Error", details: err.message });
       }
 
       if (results.length > 0) {
@@ -327,7 +379,9 @@ export const registerCaretakerProfile = (req, res) => {
           (err) => {
             if (err) {
               console.error("Error during update:", err);
-              return res.status(500).json({ error: "Internal Server Error", details: err.message });
+              return res
+                .status(500)
+                .json({ error: "Internal Server Error", details: err.message });
             }
 
             db.query(
@@ -336,7 +390,10 @@ export const registerCaretakerProfile = (req, res) => {
               (err) => {
                 if (err) {
                   console.error("Error during address update:", err);
-                  return res.status(500).json({ error: "Internal Server Error", details: err.message });
+                  return res.status(500).json({
+                    error: "Internal Server Error",
+                    details: err.message,
+                  });
                 }
 
                 db.query(
@@ -345,14 +402,19 @@ export const registerCaretakerProfile = (req, res) => {
                   (err) => {
                     if (err) {
                       console.error("Error during mediCondition update:", err);
-                      return res.status(500).json({ error: "Internal Server Error", details: err.message });
+                      return res.status(500).json({
+                        error: "Internal Server Error",
+                        details: err.message,
+                      });
                     }
-                    return res.status(200).json({ message: "Data updated successfully" });
-                  }
+                    return res
+                      .status(200)
+                      .json({ message: "Data updated successfully" });
+                  },
                 );
-              }
+              },
             );
-          }
+          },
         );
       } else {
         db.query(
@@ -370,7 +432,9 @@ export const registerCaretakerProfile = (req, res) => {
           (err, results) => {
             if (err) {
               console.error("Error during registration:", err);
-              return res.status(500).json({ error: "Internal Server Error", details: err.message });
+              return res
+                .status(500)
+                .json({ error: "Internal Server Error", details: err.message });
             }
 
             const caretakerId = results.insertId;
@@ -381,7 +445,10 @@ export const registerCaretakerProfile = (req, res) => {
               (err) => {
                 if (err) {
                   console.error("Error during address data insertion:", err);
-                  return res.status(500).json({ error: "Internal Server Error", details: err.message });
+                  return res.status(500).json({
+                    error: "Internal Server Error",
+                    details: err.message,
+                  });
                 }
 
                 db.query(
@@ -389,18 +456,26 @@ export const registerCaretakerProfile = (req, res) => {
                   [mediCondition, caretakerId],
                   (err) => {
                     if (err) {
-                      console.error("Error during mediCondition data insertion:", err);
-                      return res.status(500).json({ error: "Internal Server Error", details: err.message });
+                      console.error(
+                        "Error during mediCondition data insertion:",
+                        err,
+                      );
+                      return res.status(500).json({
+                        error: "Internal Server Error",
+                        details: err.message,
+                      });
                     }
-                    return res.status(201).json({ message: "Caretaker data registered successfully" });
-                  }
+                    return res.status(201).json({
+                      message: "Caretaker data registered successfully",
+                    });
+                  },
                 );
-              }
+              },
             );
-          }
+          },
         );
       }
-    }
+    },
   );
 };
 
@@ -429,22 +504,37 @@ export const updateCaretakerProfile = (req, res) => {
     (err, results) => {
       if (err) {
         console.error("Error finding caretaker:", err);
-        return res.status(500).json({ error: "Internal Server Error", details: err.message });
+        return res
+          .status(500)
+          .json({ error: "Internal Server Error", details: err.message });
       }
 
       if (results.length === 0) {
-        return res.status(404).json({ error: "Caretaker profile not found for this user" });
+        return res
+          .status(404)
+          .json({ error: "Caretaker profile not found for this user" });
       }
 
       const caretakerId = results[0].caretakerId;
 
       db.query(
         "UPDATE caretakernew SET firstName = ?, lastName = ?, nationalId = ?, dob = ?, mobileNo = ?, emergCont = ?, category = ? WHERE caretakerId = ?",
-        [firstName, lastName, nationalId, dob, mobileNo, emergCont, category, caretakerId],
+        [
+          firstName,
+          lastName,
+          nationalId,
+          dob,
+          mobileNo,
+          emergCont,
+          category,
+          caretakerId,
+        ],
         (err) => {
           if (err) {
             console.error("Error during update:", err);
-            return res.status(500).json({ error: "Internal Server Error", details: err.message });
+            return res
+              .status(500)
+              .json({ error: "Internal Server Error", details: err.message });
           }
 
           db.query(
@@ -453,7 +543,10 @@ export const updateCaretakerProfile = (req, res) => {
             (err) => {
               if (err) {
                 console.error("Error during address update:", err);
-                return res.status(500).json({ error: "Internal Server Error", details: err.message });
+                return res.status(500).json({
+                  error: "Internal Server Error",
+                  details: err.message,
+                });
               }
 
               db.query(
@@ -462,16 +555,21 @@ export const updateCaretakerProfile = (req, res) => {
                 (err) => {
                   if (err) {
                     console.error("Error during mediCondition update:", err);
-                    return res.status(500).json({ error: "Internal Server Error", details: err.message });
+                    return res.status(500).json({
+                      error: "Internal Server Error",
+                      details: err.message,
+                    });
                   }
-                  return res.status(200).json({ message: "Profile updated successfully" });
-                }
+                  return res
+                    .status(200)
+                    .json({ message: "Profile updated successfully" });
+                },
               );
-            }
+            },
           );
-        }
+        },
       );
-    }
+    },
   );
 };
 
@@ -495,7 +593,9 @@ export const getCaretakerData = (req, res) => {
   db.query(query, [userId], (err, results) => {
     if (err) {
       console.error("Error fetching caretaker data:", err);
-      return res.status(500).json({ error: "Internal Server Error", details: err.message });
+      return res
+        .status(500)
+        .json({ error: "Internal Server Error", details: err.message });
     }
     if (results.length === 0) {
       return res.status(404).json({ error: "Caretaker data not found" });
@@ -506,4 +606,4 @@ export const getCaretakerData = (req, res) => {
 
 export const logout = (req, res) => {
   res.status(200).json({ message: "Logout successful" });
-}
+};
