@@ -1,21 +1,21 @@
-import mysql from 'mysql2'
-// const mysql = require('mysq2');
+// import mysql from 'mysql2'
+import mysql from "mysql2/promise";
 
 // Database connection configuration
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'admin',
-    database: 'serene_care_solution'
+  host: "localhost",
+  user: "root",
+  password: "admin",
+  database: "serene_care_solution",
 });
 
 // Connect to MySQL
 db.connect((err) => {
-    if (err) {
-        console.error('Error connecting to MySQL:', err);
-        return;
-    }
-    console.log('Connected to MySQL database');
+  if (err) {
+    console.error("Error connecting to MySQL:", err);
+    return;
+  }
+  console.log("Connected to MySQL database");
 });
 
 module.exports = db;

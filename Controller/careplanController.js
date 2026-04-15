@@ -1,7 +1,7 @@
 import { db } from "../server.js";
 
 
-export const getpatientDetails = (req, res) => {
+export const getcaretakerDetails = (req, res) => {
     const sql = '';
     db.query(sql, (err, results) => {
         if (err) {

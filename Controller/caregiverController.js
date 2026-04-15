@@ -5,9 +5,9 @@ export const getrequestedcaretakers = (req, res) => {
     db.query(
       `SELECT r.requirementId, r.requirement, r.startDate, r.endDate, r.status, r.caretakerId, r.preffGender, r.userId, un.userId, ct.category, cp.caretakerId, cp.caregiverId
       FROM requirement r
-      JOIN caretakernew ct ON r.caretakerId = ct.caretakerId
+      JOIN caretaker ct ON r.caretakerId = ct.caretakerId
       JOIN careplan cp ON r.requirementId = cp.requirementId
-      JOIN usernew un ON r.userId = un.userId
+      JOIN user un ON r.userId = un.userId
       WHERE r.status = 'Pending'`,
       (err, results) => {
         if (err) {
@@ -17,7 +17,7 @@ export const getrequestedcaretakers = (req, res) => {
         } else {
           res.json(results);
         }
-      }
+      },
     );
   } catch (error) {
     console.error(error.message);
@@ -28,35 +28,35 @@ export const getrequestedcaretakers = (req, res) => {
 export const acceptrequest = (req, res) => {
   const statusData = req.body;
   console.log("status data ", statusData);
-  const { requirmentID, status  } = statusData;
+  const { requirmentID, status } = statusData;
 
   console.log("requirment id ", requirmentID);
   if (!requirmentID) {
     return res.status(400).send("Missing caretakerId parameter.");
   }
   try {
+    db.query(
+      "UPDATE requirement SET status = ? WHERE requirementId = ?",
+      [status, requirmentID],
+      (err, results) => {
+        if (err) {
+          console.error("Error updating database:", err);
+          return res.status(500).send("Error updating database.");
+        }
+
         db.query(
-          "UPDATE requirement SET status = ? WHERE requirementId = ?",
+          "UPDATE careplan SET status = ? WHERE requirementId = ?",
           [status, requirmentID],
           (err, results) => {
             if (err) {
-              console.error("Error updating database:", err);
-              return res.status(500).send("Error updating database.");
+              console.error("Error updating careplan table:", err);
+              return res.status(500).send("Error updating careplan table.");
             }
-
-            db.query(
-              "UPDATE careplan SET status = ? WHERE requirementId = ?",
-              [status, requirmentID],
-              (err, results) => {
-                if (err) {
-                  console.error("Error updating careplan table:", err);
-                  return res.status(500).send("Error updating careplan table.");
-                }
-                res.status(200).send("Request accepted");
-              }
-            );
-          }
+            res.status(200).send("Request accepted");
+          },
         );
+      },
+    );
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Internal server error.");
@@ -67,57 +67,54 @@ export const assignedcaretakers = (req, res) => {
   const { caregiverId } = req.query;
   console.log("incoming params ", caregiverId);
 
-  let caregiver
+  let caregiver;
 
   db.query(
-`SELECT caregiverId FROM caregiver WHERE userId = ?`,
-[caregiverId],
-(err, results) => {
-  if (err) {
-    console.error("Error connecting to MySQL:", err);
-    res.status(500).send("Error fetching data from database.");
-    return;
-  } else {
-    console.log("care giver result ", results);
-    caregiver = results[0].caregiverId;
+    `SELECT caregiverId FROM caregiver WHERE userId = ?`,
+    [caregiverId],
+    (err, results) => {
+      if (err) {
+        console.error("Error connecting to MySQL:", err);
+        res.status(500).send("Error fetching data from database.");
+        return;
+      } else {
+        console.log("care giver result ", results);
+        caregiver = results[0].caregiverId;
 
-
-db.query(
-  `SELECT requirement.*, careplan.*, caretakernew.*, caretakeraddress.address, caretakermedicondition.mediCondition
+        db.query(
+          `SELECT requirement.*, careplan.*, caretaker.*, caretakeraddress.address, caretakermedicondition.mediCondition
       FROM requirement
       LEFT JOIN careplan ON careplan.requirementId = requirement.requirementId
-      LEFT JOIN caretakernew ON requirement.caretakerId = caretakernew.caretakerId
-      LEFT JOIN caretakeraddress ON caretakernew.caretakerId = caretakeraddress.caretakerId
-      LEFT JOIN caretakermedicondition ON caretakermedicondition.caretakerId = caretakernew.caretakerId
+      LEFT JOIN caretaker ON requirement.caretakerId = caretaker.caretakerId
+      LEFT JOIN caretakeraddress ON caretaker.caretakerId = caretakeraddress.caretakerId
+      LEFT JOIN caretakermedicondition ON caretakermedicondition.caretakerId = caretaker.caretakerId
       WHERE careplan.caregiverId = ?`,
-  [caregiver],
-  (err, results) => {
-    if (err) {
-      console.error("Error connecting to MySQL:", err);
-      res.status(500).send("Error fetching data from database.");
-      return;
-    } else {
-      console.log("care giver result ", results);
-      res.status(200).json(results);
-    }
-  }
-);
-
-  }
-}
-);    
-
+          [caregiver],
+          (err, results) => {
+            if (err) {
+              console.error("Error connecting to MySQL:", err);
+              res.status(500).send("Error fetching data from database.");
+              return;
+            } else {
+              console.log("care giver result ", results);
+              res.status(200).json(results);
+            }
+          },
+        );
+      }
+    },
+  );
 
   // console.log("caregiver 1234 ", caregiver);
 
   // try {
   //   db.query(
-  //     `SELECT requirement.*, careplan.*, caretakernew.*, caretakeraddress.address, caretakermedicondition.mediCondition
+  //     `SELECT requirement.*, careplan.*, caretaker.*, caretakeraddress.address, caretakermedicondition.mediCondition
   //     FROM requirement
   //     LEFT JOIN careplan ON careplan.requirementId = requirement.requirementId
-  //     LEFT JOIN caretakernew ON requirement.caretakerId = caretakernew.caretakerId
-  //     LEFT JOIN caretakeraddress ON caretakernew.caretakerId = caretakeraddress.caretakerId
-  //     LEFT JOIN caretakermedicondition ON caretakermedicondition.caretakerId = caretakernew.caretakerId
+  //     LEFT JOIN caretaker ON requirement.caretakerId = caretaker.caretakerId
+  //     LEFT JOIN caretakeraddress ON caretaker.caretakerId = caretakeraddress.caretakerId
+  //     LEFT JOIN caretakermedicondition ON caretakermedicondition.caretakerId = caretaker.caretakerId
   //     WHERE careplan.caregiverId = ?`,
   //     [caregiver],
   //     (err, results) => {
@@ -151,7 +148,7 @@ export const rejectRequest = (req, res) => {
         } else {
           res.json({ message: "Request rejected successfully." });
         }
-      }
+      },
     );
   } catch (error) {
     console.error(error.message);
@@ -181,7 +178,7 @@ export const getAllRequirements = (req, res) => {
     ctm.mediCondition
     FROM
     requirement r
-    JOIN caretakernew ct ON r.caretakerId = ct.caretakerId
+    JOIN caretaker ct ON r.caretakerId = ct.caretakerId
     JOIN caretakeraddress cta ON ct.caretakerId = cta.caretakerId
     JOIN caretakermedicondition ctm ON ct.caretakerId = ctm.caretakerId;`,
     (err, results) => {
@@ -192,6 +189,6 @@ export const getAllRequirements = (req, res) => {
           .json({ error: "Internal Server Error", details: err.message });
       }
       res.json(results);
-    }
+    },
   );
 };

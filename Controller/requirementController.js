@@ -25,7 +25,7 @@ export const insertRequirement = (req, res) => {
       }
 
       res.status(201).json({ message: "Requirement inserted successfully" });
-    }
+    },
   );
 };
 
@@ -37,9 +37,9 @@ export const insertRequest = (req, res) => {
     return res.status(400).json({ error: "User ID is required" });
   }
 
-  // First, get the caretakerId from the caretakernew table using userId
+  // First, get the caretakerId from the caretaker table using userId
   db.query(
-    "SELECT caretakerId FROM caretakernew WHERE userId = ?",
+    "SELECT caretakerId FROM caretaker WHERE userId = ?",
     [userId],
     (err, results) => {
       if (err) {
@@ -70,14 +70,14 @@ export const insertRequest = (req, res) => {
           res
             .status(201)
             .json({ message: "Requirement inserted successfully" });
-        }
+        },
       );
-    }
+    },
   );
 };
 
 export const getAllcaretakers = (req, res) => {
-  db.query("SELECT * FROM caretakernew", (err, results) => {
+  db.query("SELECT * FROM caretaker", (err, results) => {
     if (err) {
       console.error("Error fetching caretakers:", err.message);
       return res
@@ -110,7 +110,7 @@ export const getAllRequirements = (req, res) => {
     ctm.mediCondition
     FROM
     requirement r
-    JOIN caretakernew ct ON r.caretakerId = ct.caretakerId
+    JOIN caretaker ct ON r.caretakerId = ct.caretakerId
     JOIN caretakeraddress cta ON ct.caretakerId = cta.caretakerId
     JOIN caretakermedicondition ctm ON ct.caretakerId = ctm.caretakerId;`,
     (err, results) => {
@@ -121,7 +121,7 @@ export const getAllRequirements = (req, res) => {
           .json({ error: "Internal Server Error", details: err.message });
       }
       res.json(results);
-    }
+    },
   );
 };
 
@@ -144,9 +144,9 @@ export const getAllRequirements = (req, res) => {
 //     // Get the inserted requirement's ID
 //     const requirementId = requirementResult.insertId;
 
-//     // Update preferredGender in the caretakernew table
+//     // Update preferredGender in the caretaker table
 //     // const updateCaretakerQuery = `
-//     //   UPDATE caretakernew
+//     //   UPDATE caretaker
 //     //   SET prefGender = ?
 //     //   WHERE caretakerId = ?
 //     // `;
@@ -218,7 +218,7 @@ export const getAllRequirements = (req, res) => {
 //     ctm.mediCondition
 // FROM
 //     requirement r
-// JOIN caretakernew ct ON r.caretakerId = ct.caretakerId
+// JOIN caretaker ct ON r.caretakerId = ct.caretakerId
 // JOIN caretakeraddress cta ON ct.caretakerId = cta.caretakerId
 // JOIN caretakermedicondition ctm ON ct.caretakerId = ctm.caretakerId;`,
 //     (err, results) => {
