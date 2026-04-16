@@ -35,25 +35,29 @@ export const registerCaretaker = async (req, res) => {
 
     try {
       // Create a placeholder record in caretaker table
-      const [caretakerResult] = await db.promise().query(
-        "INSERT INTO caretaker (userId) VALUES (?)",
-        [userId]
-      );
-      
+      const [caretakerResult] = await db
+        .promise()
+        .query("INSERT INTO caretaker (userId) VALUES (?)", [userId]);
+
       const caretakerId = caretakerResult.insertId;
 
       // Create placeholder records in dependent tables
-      await db.promise().query(
-        "INSERT INTO caretakeraddress (caretakerId) VALUES (?)",
-        [caretakerId]
-      );
+      await db
+        .promise()
+        .query("INSERT INTO caretakeraddress (caretakerId) VALUES (?)", [
+          caretakerId,
+        ]);
 
-      await db.promise().query(
-        "INSERT INTO caretakermedicondition (caretakerId) VALUES (?)",
-        [caretakerId]
-      );
+      await db
+        .promise()
+        .query("INSERT INTO caretakermedicondition (caretakerId) VALUES (?)", [
+          caretakerId,
+        ]);
     } catch (placeholderErr) {
-      console.warn("Could not insert placeholder records:", placeholderErr.message);
+      console.warn(
+        "Could not insert placeholder records:",
+        placeholderErr.message,
+      );
     }
 
     return res.status(201).json({
@@ -312,8 +316,9 @@ export const getCareTakerById = (req, res) => {
   });
 };
 
-export const registerCaretakerProfile = (req, res) => {
+export const updateCaretakerProfile = (req, res) => {
   const {
+    userId,
     firstName,
     lastName,
     nationalId,
@@ -323,7 +328,6 @@ export const registerCaretakerProfile = (req, res) => {
     mediCondition,
     emergCont,
     category,
-    userId,
   } = req.body;
 
   if (!userId) {
@@ -331,7 +335,7 @@ export const registerCaretakerProfile = (req, res) => {
   }
 
   db.query(
-    "SELECT * FROM caretaker WHERE userId = ? ",
+    "SELECT * FROM caretaker WHERE userId = ?",
     [userId],
     (err, results) => {
       if (err) {
@@ -449,101 +453,7 @@ export const registerCaretakerProfile = (req, res) => {
   );
 };
 
-export const updateCaretakerProfile = (req, res) => {
-  const {
-    firstName,
-    lastName,
-    nationalId,
-    mobileNo,
-    dob,
-    address,
-    mediCondition,
-    emergCont,
-    category,
-    userId,
-  } = req.body;
-
-  if (!userId) {
-    return res.status(400).json({ error: "userId is required" });
-  }
-
-  // Find caretakerId first
-  db.query(
-    "SELECT caretakerId FROM caretaker WHERE userId = ?",
-    [userId],
-    (err, results) => {
-      if (err) {
-        console.error("Error finding caretaker:", err);
-        return res
-          .status(500)
-          .json({ error: "Internal Server Error", details: err.message });
-      }
-
-      if (results.length === 0) {
-        return res
-          .status(404)
-          .json({ error: "Caretaker profile not found for this user" });
-      }
-
-      const caretakerId = results[0].caretakerId;
-
-      db.query(
-        "UPDATE caretaker SET firstName = ?, lastName = ?, nationalId = ?, dob = ?, mobileNo = ?, emergCont = ?, category = ? WHERE caretakerId = ?",
-        [
-          firstName,
-          lastName,
-          nationalId,
-          dob,
-          mobileNo,
-          emergCont,
-          category,
-          caretakerId,
-        ],
-        (err) => {
-          if (err) {
-            console.error("Error during update:", err);
-            return res
-              .status(500)
-              .json({ error: "Internal Server Error", details: err.message });
-          }
-
-          db.query(
-            "UPDATE caretakeraddress SET address = ? WHERE caretakerId = ?",
-            [address, caretakerId],
-            (err) => {
-              if (err) {
-                console.error("Error during address update:", err);
-                return res.status(500).json({
-                  error: "Internal Server Error",
-                  details: err.message,
-                });
-              }
-
-              db.query(
-                "UPDATE caretakermedicondition SET mediCondition = ? WHERE caretakerId = ?",
-                [mediCondition, caretakerId],
-                (err) => {
-                  if (err) {
-                    console.error("Error during mediCondition update:", err);
-                    return res.status(500).json({
-                      error: "Internal Server Error",
-                      details: err.message,
-                    });
-                  }
-                  return res
-                    .status(200)
-                    .json({ message: "Profile updated successfully" });
-                },
-              );
-            },
-          );
-        },
-      );
-    },
-  );
-};
-
-export const getCaretakerData = (req, res) => {
+export const getCaretakerProfile = (req, res) => {
   const userId = req.query.userId;
   if (!userId) {
     return res.status(400).json({ error: "userId is required" });
