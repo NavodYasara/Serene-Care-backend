@@ -31,9 +31,34 @@ export const registerCaretaker = async (req, res) => {
       userType: USER_TYPE,
     });
 
+    const userId = result.insertId;
+
+    try {
+      // Create a placeholder record in caretaker table
+      const [caretakerResult] = await db.promise().query(
+        "INSERT INTO caretaker (userId) VALUES (?)",
+        [userId]
+      );
+      
+      const caretakerId = caretakerResult.insertId;
+
+      // Create placeholder records in dependent tables
+      await db.promise().query(
+        "INSERT INTO caretakeraddress (caretakerId) VALUES (?)",
+        [caretakerId]
+      );
+
+      await db.promise().query(
+        "INSERT INTO caretakermedicondition (caretakerId) VALUES (?)",
+        [caretakerId]
+      );
+    } catch (placeholderErr) {
+      console.warn("Could not insert placeholder records:", placeholderErr.message);
+    }
+
     return res.status(201).json({
       message: "Caretaker registered successfully",
-      userId: result.insertId,
+      userId,
     });
   } catch (err) {
     console.error("Error during registration:", err);
@@ -288,21 +313,29 @@ export const getCareTakerById = (req, res) => {
 };
 
 export const registerCaretakerProfile = (req, res) => {
-  console.log("backend data", req.body);
+  const {
+    firstName,
+    lastName,
+    nationalId,
+    mobileNo,
+    dob,
+    address,
+    mediCondition,
+    emergCont,
+    category,
+    userId,
+  } = req.body;
 
-  const { firstName, lastName, password, userType } = req.body;
-
-  // Check if userId is provided in the request body
   if (!userId) {
     return res.status(400).json({ error: "userId is required" });
   }
 
   db.query(
-    "SELECT * FROM caretaker WHERE nationalId = ? ",
-    [nationalId],
+    "SELECT * FROM caretaker WHERE userId = ? ",
+    [userId],
     (err, results) => {
       if (err) {
-        console.error("Error during registration:", err);
+        console.error("User cannot find:", err);
         return res
           .status(500)
           .json({ error: "Internal Server Error", details: err.message });
@@ -311,16 +344,8 @@ export const registerCaretakerProfile = (req, res) => {
       if (results.length > 0) {
         const caretakerId = results[0].caretakerId;
         db.query(
-          "UPDATE caretaker SET firstName = ?, lastName = ?, dob = ?, mobileNo = ?, emergCont = ?, category = ? WHERE caretakerId = ?",
-          [
-            firstName,
-            lastName,
-            dob,
-            mobileNo,
-            emergCont,
-            category,
-            caretakerId,
-          ],
+          "UPDATE caretaker SET firstName = ?, lastName = ?, dob = ?, mobileNo = ?, emergCont = ?, category = ? WHERE userId = ?",
+          [firstName, lastName, dob, mobileNo, emergCont, category, userId],
           (err) => {
             if (err) {
               console.error("Error during update:", err);
