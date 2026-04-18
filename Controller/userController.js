@@ -454,6 +454,7 @@ export const getCaretakerProfile = (req, res) => {
   const query = `    
     SELECT 
       ct.*, 
+      DATE_FORMAT(ct.dob, '%Y-%m-%d') AS dob,
       cta.address
     FROM caretaker ct
     LEFT JOIN caretakeraddress cta ON ct.caretakerId = cta.caretakerId
