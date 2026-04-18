@@ -459,14 +459,12 @@ export const getCaretakerProfile = (req, res) => {
     return res.status(400).json({ error: "userId is required" });
   }
 
-  const query = `
+  const query = `    
     SELECT 
       ct.*, 
-      cta.address, 
-      ctm.mediCondition 
+      cta.address
     FROM caretaker ct
     LEFT JOIN caretakeraddress cta ON ct.caretakerId = cta.caretakerId
-    LEFT JOIN caretakermedicondition ctm ON ct.caretakerId = ctm.caretakerId
     WHERE ct.userId = ?
   `;
 
