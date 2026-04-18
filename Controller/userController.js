@@ -2,10 +2,10 @@ import bcrypt from "bcrypt";
 import { db } from "../server.js";
 
 export const registerCaretaker = async (req, res) => {
-  const { userName, password } = req.body;
+  const { email, password } = req.body;
   const USER_TYPE = "caretaker";
 
-  if (!userName || !password) {
+  if (!email || !password) {
     return res
       .status(400)
       .json({ error: "User Name and password are required" });
@@ -14,8 +14,8 @@ export const registerCaretaker = async (req, res) => {
   try {
     const [existing] = await db
       .promise()
-      .query("SELECT * FROM user WHERE userName = ? AND userType = ?", [
-        userName,
+      .query("SELECT * FROM user WHERE email = ? AND userType = ?", [
+        email,
         USER_TYPE,
       ]);
 
@@ -26,7 +26,7 @@ export const registerCaretaker = async (req, res) => {
     const hash = await bcrypt.hash(password, 10);
 
     const [result] = await db.promise().query("INSERT INTO user SET ?", {
-      userName,
+      email,
       password: hash,
       userType: USER_TYPE,
     });
@@ -73,10 +73,10 @@ export const registerCaretaker = async (req, res) => {
 };
 
 export const registerAdmin = async (req, res) => {
-  const { firstName, lastName, userName, password } = req.body;
+  const { firstName, lastName, email, password } = req.body;
   const USER_TYPE = "admin";
 
-  if (!userName || !password) {
+  if (!email || !password) {
     return res
       .status(400)
       .json({ error: "User Name and password are required" });
@@ -85,8 +85,8 @@ export const registerAdmin = async (req, res) => {
   try {
     const [existing] = await db
       .promise()
-      .query("SELECT * FROM user WHERE userName = ? AND userType = ?", [
-        userName,
+      .query("SELECT * FROM user WHERE email = ? AND userType = ?", [
+        email,
         USER_TYPE,
       ]);
 
@@ -99,7 +99,7 @@ export const registerAdmin = async (req, res) => {
     const [result] = await db.promise().query("INSERT INTO user SET ?", {
       firstName,
       lastName,
-      userName,
+      email,
       password: hash,
       userType: USER_TYPE,
     });
@@ -118,7 +118,7 @@ export const registerCaregiver = (req, res) => {
   const {
     firstName,
     lastName,
-    userName,
+    email,
     password,
     mobileNo,
     dob,
@@ -127,7 +127,7 @@ export const registerCaregiver = (req, res) => {
   } = req.body;
   const userType = "caregiver";
 
-  if (!userName || !password) {
+  if (!email || !password) {
     return res
       .status(400)
       .json({ error: "User Name and password are required" });
@@ -142,8 +142,8 @@ export const registerCaregiver = (req, res) => {
     }
 
     db.query(
-      "SELECT * FROM user WHERE userName = ? AND userType = ?",
-      [userName, userType],
+      "SELECT * FROM user WHERE email = ? AND userType = ?",
+      [email, userType],
       (err, results) => {
         if (err) {
           console.error("Error during registration:", err);
@@ -153,7 +153,7 @@ export const registerCaregiver = (req, res) => {
         }
 
         if (results.length > 0) {
-          return res.status(409).json({ error: "Username already exists" });
+          return res.status(409).json({ error: "email already exists" });
         }
 
         db.query(
@@ -161,7 +161,7 @@ export const registerCaregiver = (req, res) => {
           {
             firstName,
             lastName,
-            userName,
+            email,
             password: hash,
             userType,
             mobileNo,
@@ -221,18 +221,25 @@ export const registerCaregiver = (req, res) => {
 };
 
 export const login = (req, res) => {
-  const { userName, password } = req.body;
+  const { email, password } = req.body;
 
-  if (!userName || !password) {
-    return res
-      .status(400)
-      .json({ error: "Username and password are required" });
+  if (!email || !password) {
+    return res.status(400).json({ error: "email and password are required" });
   }
 
-  db.query(
-    "SELECT * FROM user WHERE userName = ?",
-    [userName],
-    (err, results) => {
+  db.query("SELECT * FROM user WHERE email = ?", [email], (err, results) => {
+    if (err) {
+      console.error("Error during login:", err);
+      return res
+        .status(500)
+        .json({ error: "Internal Server Error", details: err.message });
+    }
+
+    if (results.length === 0) {
+      return res.status(401).json({ error: "Invalid email or password" });
+    }
+
+    bcrypt.compare(password, results[0].password, (err, isMatch) => {
       if (err) {
         console.error("Error during login:", err);
         return res
@@ -240,36 +247,21 @@ export const login = (req, res) => {
           .json({ error: "Internal Server Error", details: err.message });
       }
 
-      if (results.length === 0) {
-        return res.status(401).json({ error: "Invalid userName or password" });
+      if (!isMatch) {
+        return res.status(401).json({ error: "Invalid email or password" });
       }
 
-      bcrypt.compare(password, results[0].password, (err, isMatch) => {
-        if (err) {
-          console.error("Error during login:", err);
-          return res
-            .status(500)
-            .json({ error: "Internal Server Error", details: err.message });
-        }
+      // Login successful, include user type in the response
+      console.log(results[0]);
+      const userType = results[0].userType;
 
-        if (!isMatch) {
-          return res
-            .status(401)
-            .json({ error: "Invalid username or password" });
-        }
-
-        // Login successful, include user type in the response
-        console.log(results[0]);
-        const userType = results[0].userType;
-
-        res.status(200).json({
-          message: "Login successful",
-          userType,
-          userDetails: results[0],
-        });
+      res.status(200).json({
+        message: "Login successful",
+        userType,
+        userDetails: results[0],
       });
-    },
-  );
+    });
+  });
 };
 
 export const userDetails = (req, res) => {
