@@ -1,6 +1,6 @@
 import { db } from "../server.js";
 
-// Get detailed caretaker information from both ct & ctAddress & ctMediCondition tables
+// Get detailed caretaker information from both ct & ctAddress
 export const getCaretakerInformation = async (req, res) => {
   try {
     const query = `
@@ -8,8 +8,6 @@ export const getCaretakerInformation = async (req, res) => {
       FROM requirement r
       LEFT JOIN caretaker ct 
       ON r.caretakerId = ct.caretakerId
-      LEFT JOIN caretakermedicondition ctm
-      ON ct.caretakerId = ctm.caretakerId
     `;
 
     db.query(query, (err, results) => {
@@ -36,14 +34,12 @@ export const getCaretakerById = async (req, res) => {
           ct.*, 
         r.requirement, 
         cta.address, 
-        ctm.mediCondition, 
         DATE_FORMAT(ct.dob, '%Y-%m-%d') AS formattedDob,
         ct.firstName,
         ct.lastName
         FROM caretaker ct
         LEFT JOIN requirement r ON ct.caretakerId = r.caretakerId 
         LEFT JOIN caretakeraddress cta ON ct.caretakerId = cta.caretakerId
-        LEFT JOIN caretakermedicondition ctm ON ct.caretakerId = ctm.caretakerId
         WHERE ct.caretakerId = ?; 
     `;
 

@@ -82,13 +82,13 @@ export const assignedcaretakers = (req, res) => {
         caregiver = results[0].caregiverId;
 
         db.query(
-          `SELECT requirement.*, careplan.*, caretaker.*, caretakeraddress.address, caretakermedicondition.mediCondition
-      FROM requirement
-      LEFT JOIN careplan ON careplan.requirementId = requirement.requirementId
-      LEFT JOIN caretaker ON requirement.caretakerId = caretaker.caretakerId
-      LEFT JOIN caretakeraddress ON caretaker.caretakerId = caretakeraddress.caretakerId
-      LEFT JOIN caretakermedicondition ON caretakermedicondition.caretakerId = caretaker.caretakerId
-      WHERE careplan.caregiverId = ?`,
+          `SELECT requirement.*, careplan.*, caretaker.*, caretakeraddress.address, caretaker.mediCon
+          FROM requirement
+          LEFT JOIN careplan ON careplan.requirementId = requirement.requirementId
+          LEFT JOIN caretaker ON requirement.caretakerId = caretaker.caretakerId
+          LEFT JOIN caretakeraddress ON caretaker.caretakerId = caretakeraddress.caretakerId
+          WHERE careplan.caregiverId = ?
+          `,
           [caregiver],
           (err, results) => {
             if (err) {
@@ -104,34 +104,6 @@ export const assignedcaretakers = (req, res) => {
       }
     },
   );
-
-  // console.log("caregiver 1234 ", caregiver);
-
-  // try {
-  //   db.query(
-  //     `SELECT requirement.*, careplan.*, caretaker.*, caretakeraddress.address, caretakermedicondition.mediCondition
-  //     FROM requirement
-  //     LEFT JOIN careplan ON careplan.requirementId = requirement.requirementId
-  //     LEFT JOIN caretaker ON requirement.caretakerId = caretaker.caretakerId
-  //     LEFT JOIN caretakeraddress ON caretaker.caretakerId = caretakeraddress.caretakerId
-  //     LEFT JOIN caretakermedicondition ON caretakermedicondition.caretakerId = caretaker.caretakerId
-  //     WHERE careplan.caregiverId = ?`,
-  //     [caregiver],
-  //     (err, results) => {
-  //       if (err) {
-  //         console.error("Error connecting to MySQL:", err);
-  //         res.status(500).send("Error fetching data from database.");
-  //         return;
-  //       } else {
-  //         console.log("care giver result ", results);
-  //         res.json(results);
-  //       }
-  //     }
-  //   );
-  // } catch (error) {
-  //   console.error(error.message);
-  //   res.status(500).send("Internal server error.");
-  // }
 };
 
 export const rejectRequest = (req, res) => {
@@ -173,14 +145,13 @@ export const getAllRequirements = (req, res) => {
     ct.nationalId,
     ct.mobileNo,
     ct.dob,
+    ct.mediCon,
     ct.emergCont,
-    cta.address,
-    ctm.mediCondition
+    cta.address
     FROM
     requirement r
     JOIN caretaker ct ON r.caretakerId = ct.caretakerId
-    JOIN caretakeraddress cta ON ct.caretakerId = cta.caretakerId
-    JOIN caretakermedicondition ctm ON ct.caretakerId = ctm.caretakerId;`,
+    JOIN caretakeraddress cta ON ct.caretakerId = cta.caretakerId`,
     (err, results) => {
       if (err) {
         console.error("Error fetching requirements:", err.message);

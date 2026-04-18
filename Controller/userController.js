@@ -47,12 +47,6 @@ export const registerCaretaker = async (req, res) => {
         .query("INSERT INTO caretakeraddress (caretakerId) VALUES (?)", [
           caretakerId,
         ]);
-
-      await db
-        .promise()
-        .query("INSERT INTO caretakermedicondition (caretakerId) VALUES (?)", [
-          caretakerId,
-        ]);
     } catch (placeholderErr) {
       console.warn(
         "Could not insert placeholder records:",
@@ -313,11 +307,12 @@ export const updateCaretakerProfile = (req, res) => {
     userId,
     firstName,
     lastName,
+    email,
     nationalId,
     mobileNo,
     dob,
     address,
-    mediCondition,
+    mediCon,
     emergCont,
     category,
   } = req.body;
@@ -340,8 +335,18 @@ export const updateCaretakerProfile = (req, res) => {
       if (results.length > 0) {
         const caretakerId = results[0].caretakerId;
         db.query(
-          "UPDATE caretaker SET firstName = ?, lastName = ?, dob = ?, mobileNo = ?, emergCont = ?, category = ? WHERE userId = ?",
-          [firstName, lastName, dob, mobileNo, emergCont, category, userId],
+          "UPDATE caretaker SET firstName = ?, lastName = ?, email = ?, nationalId = ?, mobileNo = ?, dob = ?, emergCont = ?, mediCon = ? WHERE userId = ?",
+          [
+            firstName,
+            lastName,
+            email,
+            nationalId,
+            mobileNo,
+            dob,
+            emergCont,
+            mediCon,
+            userId,
+          ],
           (err) => {
             if (err) {
               console.error("Error during update:", err);
@@ -361,81 +366,7 @@ export const updateCaretakerProfile = (req, res) => {
                     details: err.message,
                   });
                 }
-
-                db.query(
-                  "UPDATE caretakermedicondition SET mediCondition = ? WHERE caretakerId = ?",
-                  [mediCondition, caretakerId],
-                  (err) => {
-                    if (err) {
-                      console.error("Error during mediCondition update:", err);
-                      return res.status(500).json({
-                        error: "Internal Server Error",
-                        details: err.message,
-                      });
-                    }
-                    return res
-                      .status(200)
-                      .json({ message: "Data updated successfully" });
-                  },
-                );
-              },
-            );
-          },
-        );
-      } else {
-        db.query(
-          "INSERT INTO caretaker (firstName, lastName, nationalId, dob, mobileNo, emergCont, category, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-          [
-            firstName,
-            lastName,
-            nationalId,
-            dob,
-            mobileNo,
-            emergCont,
-            category,
-            userId,
-          ],
-          (err, results) => {
-            if (err) {
-              console.error("Error during registration:", err);
-              return res
-                .status(500)
-                .json({ error: "Internal Server Error", details: err.message });
-            }
-
-            const caretakerId = results.insertId;
-
-            db.query(
-              "INSERT INTO caretakeraddress (address, caretakerId) VALUES (?, ?)",
-              [address, caretakerId],
-              (err) => {
-                if (err) {
-                  console.error("Error during address data insertion:", err);
-                  return res.status(500).json({
-                    error: "Internal Server Error",
-                    details: err.message,
-                  });
-                }
-
-                db.query(
-                  "INSERT INTO caretakermedicondition (mediCondition, caretakerId) VALUES (?, ?)",
-                  [mediCondition, caretakerId],
-                  (err) => {
-                    if (err) {
-                      console.error(
-                        "Error during mediCondition data insertion:",
-                        err,
-                      );
-                      return res.status(500).json({
-                        error: "Internal Server Error",
-                        details: err.message,
-                      });
-                    }
-                    return res.status(201).json({
-                      message: "Caretaker data registered successfully",
-                    });
-                  },
-                );
+                return res.status(200).json({ message: "Data updated successfully" });
               },
             );
           },
