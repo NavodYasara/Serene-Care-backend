@@ -1,4 +1,4 @@
-import { db } from "../server.js";
+import { db } from "../db.js";
 
 // Get detailed caretaker information from both ct & ctAddress
 export const getCaretakerInformation = async (req, res) => {

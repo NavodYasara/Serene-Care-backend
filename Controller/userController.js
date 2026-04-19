@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
-import { db } from "../server.js";
+import jwt from "jsonwebtoken";
+import { db } from "../db.js";
 
 export const registerCaretaker = async (req, res) => {
   const { email, password } = req.body;
@@ -249,10 +250,17 @@ export const login = (req, res) => {
       console.log(results[0]);
       const userType = results[0].userType;
 
+      const token = jwt.sign(
+        { userId: results[0].userId, userType },
+        process.env.JWT_SECRET || "serene_care_super_secret_key",
+        { expiresIn: "10h" },
+      );
+
       res.status(200).json({
         message: "Login successful",
         userType,
         userDetails: results[0],
+        token,
       });
     });
   });
@@ -366,7 +374,9 @@ export const updateCaretakerProfile = (req, res) => {
                     details: err.message,
                   });
                 }
-                return res.status(200).json({ message: "Data updated successfully" });
+                return res
+                  .status(200)
+                  .json({ message: "Data updated successfully" });
               },
             );
           },

@@ -1,4 +1,4 @@
-import { db } from "../server.js";
+import { db } from "../db.js";
 
 export const getrequestedcaretakers = (req, res) => {
   try {

@@ -1,8 +1,8 @@
-// import mysql from 'mysql2'
-import mysql from "mysql2/promise";
+import mysql from "mysql2";
 
 // Database connection configuration
-const db = mysql.createConnection({
+
+export const db = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "admin",
@@ -17,5 +17,3 @@ db.connect((err) => {
   }
   console.log("Connected to MySQL database");
 });
-
-module.exports = db;
