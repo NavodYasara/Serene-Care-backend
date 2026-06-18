@@ -60,3 +60,17 @@ export const getAllcaretakers = (req, res) => {
     res.json(results);
   });
 };
+
+export const getAllRequest = (req, res) => {
+  db.query("SELECT * FROM requirement", (err, results) => {
+    if (err) {
+      console.error("Error fetching requests", err.message);
+      return res
+        .status(500)
+        .json({ error: "Server Error", details: err.message });
+    }
+    res.json(results)
+  });
+};
+
+

@@ -122,8 +122,8 @@ export const allocateCaregiver = async (req, res) => {
 
       const category = results[0].category;
 
-      // Check if a row with the relevant requirementId exists in the careplan table
-      const checkQuery = `SELECT * FROM careplan WHERE requirementId = ?`;
+      // Check if a row with the relevant requirementId exists in the appoinment table
+      const checkQuery = `SELECT * FROM appoinment WHERE requirementId = ?`;
       db.query(checkQuery, [requirementId], (err, results) => {
         if (err) {
           console.error(err.message);
@@ -135,12 +135,12 @@ export const allocateCaregiver = async (req, res) => {
         const isUpdate = results.length > 0;
         const query = isUpdate
           ? `
-            UPDATE careplan
+            UPDATE appoinment
             SET caretakerId = ?, caregiverId = ?, status = 'not assigned', instruction = ?, category = ?
             WHERE requirementId = ?
           `
           : `
-            INSERT INTO careplan (caretakerId, caregiverId, requirementId, status, instruction, category)
+            INSERT INTO appoinment (caretakerId, caregiverId, requirementId, status, instruction, category)
             VALUES (?, ?, ?, 'not assigned', ?, ?)
           `;
 
@@ -155,7 +155,7 @@ export const allocateCaregiver = async (req, res) => {
               res.status(500).json({ error: err.message });
             } else {
               const message = isUpdate
-                ? "Careplan updated successfully!"
+                ? "appoinment updated successfully!"
                 : "Caregiver allocated successfully!";
               res.json({ message });
             }
@@ -172,7 +172,7 @@ export const allocateCaregiver = async (req, res) => {
 export const handleinstruction = async (req, res) => {
   try {
     const { instruction, requirementId } = req.body;
-    const query = `update careplan set instruction = ? where requirementId = ?`;
+    const query = `update appoinment set instruction = ? where requirementId = ?`;
     db.query(query, [instruction, requirementId], (err, results) => {
       if (err) {
         console.error(err.message);

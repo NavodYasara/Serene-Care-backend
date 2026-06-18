@@ -6,7 +6,7 @@ export const getrequestedcaretakers = (req, res) => {
       `SELECT r.requirementId, r.requirement, r.startDate, r.endDate, r.status, r.caretakerId, r.preffGender, r.userId, un.userId, ct.category, cp.caretakerId, cp.caregiverId
       FROM requirement r
       JOIN caretaker ct ON r.caretakerId = ct.caretakerId
-      JOIN careplan cp ON r.requirementId = cp.requirementId
+      JOIN appoinment cp ON r.requirementId = cp.requirementId
       JOIN user un ON r.userId = un.userId
       WHERE r.status = 'Pending'`,
       (err, results) => {
@@ -45,12 +45,12 @@ export const acceptrequest = (req, res) => {
         }
 
         db.query(
-          "UPDATE careplan SET status = ? WHERE requirementId = ?",
+          "UPDATE appoinment SET status = ? WHERE requirementId = ?",
           [status, requirmentID],
           (err, results) => {
             if (err) {
-              console.error("Error updating careplan table:", err);
-              return res.status(500).send("Error updating careplan table.");
+              console.error("Error updating appoinment table:", err);
+              return res.status(500).send("Error updating appoinment table.");
             }
             res.status(200).send("Request accepted");
           },
@@ -82,12 +82,12 @@ export const assignedcaretakers = (req, res) => {
         caregiver = results[0].caregiverId;
 
         db.query(
-          `SELECT requirement.*, careplan.*, caretaker.*, caretakeraddress.address, caretaker.mediCon
+          `SELECT requirement.*, appoinment.*, caretaker.*, caretakeraddress.address, caretaker.mediCon
           FROM requirement
-          LEFT JOIN careplan ON careplan.requirementId = requirement.requirementId
+          LEFT JOIN appoinment ON appoinment.requirementId = requirement.requirementId
           LEFT JOIN caretaker ON requirement.caretakerId = caretaker.caretakerId
           LEFT JOIN caretakeraddress ON caretaker.caretakerId = caretakeraddress.caretakerId
-          WHERE careplan.caregiverId = ?
+          WHERE appoinment.caregiverId = ?
           `,
           [caregiver],
           (err, results) => {
@@ -110,7 +110,7 @@ export const rejectRequest = (req, res) => {
   const { caretakerId } = req.params;
   try {
     db.query(
-      "UPDATE careplan SET status = 'Rejected' WHERE caretakerId = ? AND status = 'Rejected'",
+      "UPDATE appoinment SET status = 'Rejected' WHERE caretakerId = ? AND status = 'Rejected'",
       [caretakerId],
       (err, results) => {
         if (err) {

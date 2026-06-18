@@ -5,7 +5,7 @@ import {
   registerAdmin,
   registerCaretaker,
   registerCaregiver,
-  userDetails,
+  userProfile,
   getCaretakerDetails,
   updateCaretakerProfile,
   getCaretakerProfile,
@@ -18,7 +18,7 @@ router.post("/registerCaregiver", registerCaregiver);
 router.post("/registerAdmin", registerAdmin);
 router.put("/updateCaretakerProfile", updateCaretakerProfile);
 router.post("/login", login); // Define the route for the login controller
-router.get("/userDetails", userDetails); // client makes a GET request to /userDetails,router will call the userDetails function.
+router.get("/userProfile", userProfile); // client makes a GET request to /userProfile,router will call the userProfile function.
 router.get("/caretakerDetails", getCaretakerDetails);
 router.get("/getCaretakerProfile", getCaretakerProfile);
 router.post("/logout", logout);

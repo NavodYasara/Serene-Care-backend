@@ -259,14 +259,14 @@ export const login = (req, res) => {
       res.status(200).json({
         message: "Login successful",
         userType,
-        userDetails: results[0],
+        userProfile: results[0],
         token,
       });
     });
   });
 };
 
-export const userDetails = (req, res) => {
+export const userProfile = (req, res) => {
   const query = "SELECT * FROM user";
 
   db.query(query, (err, results) => {
