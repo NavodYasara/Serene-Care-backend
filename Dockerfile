@@ -3,7 +3,7 @@
 # ==========================================
 FROM node:18-alpine AS builder
 
-WORKDIR /app
+WORKDIR /serene-app
 
 # Copy dependency definition files
 COPY package*.json ./
@@ -34,7 +34,7 @@ COPY package*.json ./
 RUN npm ci --only=production
 
 # Copy the compiled JS files from the builder stage
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /serene-app/dist ./dist
 
 # Run as a non-root user (security best practice)
 USER node
