@@ -4,4 +4,10 @@ export interface User {
     email: string;
     password: string;
     userType: string;
+    firstName?:string;
+    lastName?:string;
+    mobileNo?:string;
+    dob?:string;
+    address?:string;
+    gender?:string;
 }
