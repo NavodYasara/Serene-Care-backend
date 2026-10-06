@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { db } from "../db.js";
+import { User } from "../types/User.js";
 
 export const registerCaretaker = async (
   req: Request,
@@ -251,8 +252,9 @@ export const login = (req: Request, res: Response): void => {
         res.status(401).json({ error: "Invalid email or password" });
         return;
       }
+      const user = results[0] as User;
 
-      bcrypt.compare(password, results[0].password, (err, isMatch) => {
+      bcrypt.compare(password, user.password, (err, isMatch) => {
         if (err) {
           console.error("Error during login:", err);
           res
@@ -267,11 +269,11 @@ export const login = (req: Request, res: Response): void => {
         }
 
         // Login successful, include user type in the response
-        console.log(results[0]);
-        const userType = results[0].userType;
+        console.log(user);
+        const userType = user.userType;
 
         const token = jwt.sign(
-          { userId: results[0].userId, userType },
+          { userId: user.id, userType },
           process.env.JWT_SECRET || "serene_care_super_secret_key",
           { expiresIn: "10h" },
         );
@@ -279,7 +281,7 @@ export const login = (req: Request, res: Response): void => {
         res.status(200).json({
           message: "Login successful",
           userType,
-          userProfile: results[0],
+          userProfile: user,
           token,
         });
       });
